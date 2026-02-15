@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --color-*: initial;
+
+  --grey-50: oklch(97% 0.005 80);
+  --grey-100: oklch(93% 0.008 80);
+  --grey-300: oklch(82% 0.012 80);
+  --grey-600: oklch(55% 0.012 80);
+  --grey-800: oklch(30% 0.012 80);
+  --grey-900: oklch(18% 0.012 80);
+
+  --color-canvas: light-dark(var(--grey-50), var(--grey-900));
+  --color-canvas2: light-dark(var(--grey-100), var(--grey-800));
+  --color-canvas-text: light-dark(var(--grey-900), var(--grey-50));
+  --color-border: light-dark(var(--grey-300), var(--grey-600));
+  --color-muted: light-dark(var(--grey-600), var(--grey-300));
+  --color-on-accent: #fff;
+
+  --color-brand: #6b7f5e;
+  --color-brand-light: color-mix(in oklab, var(--color-brand), white 15%);
+  --color-brand-dark: color-mix(in oklab, var(--color-brand), black 15%);
+
+  --text-h1: 26px;
+  --text-h1--line-height: 1;
+  --text-h1--font-weight: 600;
+  --text-h2: 22px;
+  --text-h2--line-height: 1;
+  --text-h2--font-weight: 600;
+  --text-h3: 18px;
+  --text-h3--line-height: 1;
+  --text-h3--font-weight: 600;
+
+  --text-body: 16px;
+  --text-body--line-height: 1.4;
+  --text-body--font-weight: 400;
+}
+
+:root {
+  color-scheme: light dark;
+  accent-color: var(--color-brand);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-canvas-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .section {
+    background: var(--color-canvas2);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+}

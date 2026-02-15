@@ -1,0 +1,962 @@
+{
+  "owner": "Alexandr",
+  "total_items": 65,
+  "last_updated": "2026-02-15",
+  "categories": {
+    "shirts": [
+      {
+        "id": 1,
+        "item": "Button-down check shirt",
+        "color": "ivory/check (green & yellow stripes)",
+        "brand": "GANT",
+        "season": "spring/fall",
+        "size": "M",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/shirts/01_shirt_gant_check.webp",
+        "link": "https://gant.com/regular-fit-checked-oxford-shirt-woody-green/3261006-318.html"
+      },
+      {
+        "id": 2,
+        "item": "Oxford shirt",
+        "color": "grey-blue",
+        "brand": "GANT",
+        "season": "spring/fall",
+        "size": "L",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/shirts/02_shirt_gant_grey_oxford.webp",
+        "link": "https://gant.com/regular-fit-oxford-shirt-light-blue/7325707207839.html"
+      },
+      {
+        "id": 3,
+        "item": "Linen shirt",
+        "color": "navy",
+        "brand": "Benetton",
+        "season": "summer",
+        "size": "M",
+        "materials": [
+          "linen"
+        ],
+        "sku": null,
+        "photo": "images/shirts/03_shirt_benetton_navy_linen.webp",
+        "link": "https://world.benetton.com/men-slim-fit-navy-blue-shirt-dark-blue-22P5068LR933I_901.html"
+      },
+      {
+        "id": 4,
+        "item": "Lightweight shirt",
+        "color": "light blue",
+        "brand": "Intimissimi UOMO",
+        "season": "summer",
+        "size": "L",
+        "materials": [
+          "linen"
+        ],
+        "sku": null,
+        "photo": "images/shirts/04_shirt_light_blue.webp",
+        "link": "https://www.intimissimi.com/it/product/camicia_in_lino_e_cotone_uomo-CLU225.html"
+      }
+    ],
+    "polos": [
+      {
+        "id": 5,
+        "item": "Knit polo with trim",
+        "color": "white/teal",
+        "brand": "Club Room",
+        "season": "summer",
+        "size": "L",
+        "materials": [
+          "cashmere"
+        ],
+        "sku": null,
+        "photo": "images/polos/05_polo_knit_white_teal.webp",
+        "link": null
+      },
+      {
+        "id": 6,
+        "item": "Classic polo",
+        "color": "yellow",
+        "brand": "Douglas Hayward",
+        "season": "summer",
+        "size": "M",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/polos/06_polo_yellow_dh.webp",
+        "link": null
+      },
+      {
+        "id": 7,
+        "item": "Classic polo",
+        "color": "olive",
+        "brand": "Douglas Hayward",
+        "season": "summer",
+        "size": "M",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/polos/07_polo_olive.webp",
+        "link": null
+      },
+      {
+        "id": 8,
+        "item": "Classic polo",
+        "color": "light blue",
+        "brand": "Douglas Hayward",
+        "season": "summer",
+        "size": "M",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/polos/08_polo_blue_dh.webp",
+        "link": null
+      },
+      {
+        "id": 9,
+        "item": "Classic polo",
+        "color": "navy",
+        "brand": "Douglas Hayward",
+        "season": "summer",
+        "size": "M",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/polos/09_polo_navy_dh.webp",
+        "link": null
+      },
+      {
+        "id": 10,
+        "item": "Twin Tipped polo",
+        "color": "green",
+        "brand": "Fred Perry",
+        "season": "summer",
+        "size": "L",
+        "materials": [
+          "cotton"
+        ],
+        "sku": "M3600",
+        "photo": "images/polos/10_polo_fredperry_green.webp",
+        "link": "https://www.fredperry.com/m3600-twin-tipped-fred-perry-polo-shirt"
+      },
+      {
+        "id": 11,
+        "item": "Contrast collar polo",
+        "color": "navy/yellow",
+        "brand": "Fred Perry",
+        "season": "summer",
+        "size": "M",
+        "materials": [
+          "cotton"
+        ],
+        "sku": "M4567",
+        "photo": "images/polos/11_polo_fredperry_navy_yellow.webp",
+        "link": null
+      },
+      {
+        "id": 12,
+        "item": "Classic polo",
+        "color": "white",
+        "brand": "Ralph Lauren",
+        "season": "summer",
+        "size": "L",
+        "materials": [
+          "cotton"
+        ],
+        "sku": "710534735",
+        "photo": "images/polos/12_polo_rl_white.webp",
+        "link": "https://www.farfetch.com/shopping/men/polo-ralph-lauren-cotton-polo-shirt-item-30031727.aspx"
+      },
+      {
+        "id": 13,
+        "item": "Classic polo",
+        "color": "coral",
+        "brand": "Ralph Lauren",
+        "season": "summer",
+        "size": "L",
+        "materials": [
+          "cotton"
+        ],
+        "sku": "710534735",
+        "photo": "images/polos/13_polo_rl_coral.webp",
+        "link": "https://www.yoox.com/us/12723225GF/item"
+      }
+    ],
+    "tshirts": [
+      {
+        "id": 14,
+        "item": "Basic t-shirt",
+        "color": "navy",
+        "brand": "H&M",
+        "season": "all-season",
+        "size": "M",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/tshirts/14_tshirt_black_hm.webp",
+        "link": null
+      },
+      {
+        "id": 15,
+        "item": "Basic t-shirt",
+        "color": "white",
+        "brand": "H&M",
+        "season": "all-season",
+        "size": "M",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/tshirts/15_tshirt_white_hm.webp",
+        "link": null
+      }
+    ],
+    "knitwear": [
+      {
+        "id": 16,
+        "item": "Crew neck sweater",
+        "color": "grey",
+        "brand": "s.Oliver",
+        "season": "fall/winter",
+        "size": "L",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/knitwear/16_sweater_soliver_grey.webp",
+        "link": null
+      },
+      {
+        "id": 17,
+        "item": "Crew neck sweater",
+        "color": "navy",
+        "brand": "Benetton",
+        "season": "fall/winter",
+        "size": "M",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/knitwear/17_sweater_benetton_navy.webp",
+        "link": null
+      },
+      {
+        "id": 18,
+        "item": "Turtleneck",
+        "color": "grey",
+        "brand": "Massimo Dutti",
+        "season": "fall/winter",
+        "size": "L",
+        "materials": [
+          "wool",
+          "cashmere"
+        ],
+        "sku": null,
+        "photo": "images/knitwear/18_turtleneck_grey.webp",
+        "link": null
+      },
+      {
+        "id": 19,
+        "item": "Mock neck turtleneck",
+        "color": "dark grey",
+        "brand": "D'S Damat",
+        "season": "fall/winter",
+        "size": "L",
+        "materials": [
+          "wool"
+        ],
+        "sku": null,
+        "photo": "images/knitwear/19_turtleneck_mock_darkgrey.webp",
+        "link": null
+      },
+      {
+        "id": 20,
+        "item": "Turtleneck",
+        "color": "black",
+        "brand": "Massimo Dutti",
+        "season": "fall/winter",
+        "size": "M",
+        "materials": [
+          "wool",
+          "cashmere"
+        ],
+        "sku": null,
+        "photo": "images/knitwear/20_turtleneck_black.webp",
+        "link": null
+      },
+      {
+        "id": 21,
+        "item": "Sweatshirt",
+        "color": "dark grey",
+        "brand": "U.S. Polo Assn.",
+        "season": "fall/winter",
+        "size": "M",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/knitwear/21_sweatshirt_uspolo_darkgrey.webp",
+        "link": null
+      },
+      {
+        "id": 22,
+        "item": "Sweatshirt",
+        "color": "grey",
+        "brand": "Collezione",
+        "season": "fall/winter",
+        "size": "3XL",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/knitwear/22_sweatshirt_collezione_grey.webp",
+        "link": null
+      }
+    ],
+    "overshirts": [
+      {
+        "id": 23,
+        "item": "Overshirt with pockets",
+        "color": "blue",
+        "brand": "Boss",
+        "season": "spring/fall",
+        "size": "M",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/overshirts/23_overshirt_boss_blue.webp",
+        "link": null
+      },
+      {
+        "id": 24,
+        "item": "Military jacket",
+        "color": "olive",
+        "brand": "Vintage",
+        "season": "spring/fall",
+        "size": "C50",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/overshirts/24_overshirt_military_olive.webp",
+        "link": null
+      }
+    ],
+    "blazers": [
+      {
+        "id": 25,
+        "item": "Classic blazer",
+        "color": "navy",
+        "brand": "Hackett London",
+        "season": "spring/fall",
+        "size": "50",
+        "materials": [
+          "wool"
+        ],
+        "sku": null,
+        "photo": "images/blazers/25_blazer_navy.webp",
+        "link": null
+      },
+      {
+        "id": 26,
+        "item": "Houndstooth blazer",
+        "color": "brown/beige",
+        "brand": "Selected",
+        "season": "fall/winter",
+        "size": "48",
+        "materials": [
+          "wool",
+          "polyester"
+        ],
+        "sku": null,
+        "photo": "images/blazers/26_blazer_houndstooth_selected.webp",
+        "link": null
+      },
+      {
+        "id": 27,
+        "item": "Summer blazer (linen)",
+        "color": "beige/cream",
+        "brand": "C&A",
+        "season": "summer",
+        "size": "50",
+        "materials": [
+          "linen",
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/blazers/27_blazer_linen_beige.webp",
+        "link": null
+      },
+      {
+        "id": 28,
+        "item": "Knit blazer",
+        "color": "grey",
+        "brand": "s.Oliver",
+        "season": "spring/fall",
+        "size": "50",
+        "materials": [
+          "wool",
+          "polyester"
+        ],
+        "sku": null,
+        "photo": "images/blazers/28_blazer_knit_grey.webp",
+        "link": null
+      }
+    ],
+    "jackets": [
+      {
+        "id": 30,
+        "item": "Wool jacket",
+        "color": "navy",
+        "brand": "Only & Sons",
+        "season": "fall/winter",
+        "size": "L",
+        "materials": [
+          "wool",
+          "polyester"
+        ],
+        "sku": null,
+        "photo": "images/jackets/30_jacket_wool_onlysons.webp",
+        "link": null
+      },
+      {
+        "id": 31,
+        "item": "Padded vest",
+        "color": "navy",
+        "brand": "Mango Man",
+        "season": "fall/winter",
+        "size": "M",
+        "materials": [
+          "polyester",
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/jackets/31_vest_navy.webp",
+        "link": null
+      },
+      {
+        "id": 32,
+        "item": "Hooded windbreaker",
+        "color": "navy",
+        "brand": "Benetton",
+        "season": "spring/summer",
+        "size": "L",
+        "materials": [
+          "polyester"
+        ],
+        "sku": null,
+        "photo": "images/jackets/32_windbreaker_benetton.webp",
+        "link": null
+      },
+      {
+        "id": 33,
+        "item": "Trench coat",
+        "color": "olive/khaki",
+        "brand": "Massimo Dutti",
+        "season": "spring/fall",
+        "size": "XL",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/jackets/33_trench_olive.webp",
+        "link": null
+      },
+      {
+        "id": 34,
+        "item": "Plaid overcoat",
+        "color": "grey/check",
+        "brand": "Only & Sons",
+        "season": "fall/winter",
+        "size": "L",
+        "materials": [
+          "wool",
+          "polyester"
+        ],
+        "sku": null,
+        "photo": "images/jackets/34_coat_plaid_onlysons.webp",
+        "link": null
+      },
+      {
+        "id": 35,
+        "item": "Harrington",
+        "color": "green",
+        "brand": "GANT",
+        "season": "spring/fall",
+        "size": "M",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/jackets/35_harrington_gant_green.webp",
+        "link": null
+      }
+    ],
+    "jeans": [
+      {
+        "id": 36,
+        "item": "Straight jeans",
+        "color": "dark indigo (raw)",
+        "brand": "Massimo Dutti",
+        "season": "all-season",
+        "size": "31",
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/jeans/36_jeans_dark.webp",
+        "link": null
+      },
+      {
+        "id": 37,
+        "item": "501 Original",
+        "color": "medium wash",
+        "brand": "Levi's",
+        "season": "all-season",
+        "size": "33/33",
+        "materials": [
+          "cotton"
+        ],
+        "sku": "00501",
+        "photo": "images/jeans/37_jeans_levis_501.webp",
+        "link": "https://www.levi.com/US/en_US/clothing/men/jeans/501-original-fit-mens-jeans/p/005010114"
+      },
+      {
+        "id": 38,
+        "item": "Wide/relaxed jeans",
+        "color": "light blue",
+        "brand": "Cropp",
+        "season": "spring/summer",
+        "size": null,
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/jeans/38_jeans_light_wide.webp",
+        "link": null
+      }
+    ],
+    "trousers": [
+      {
+        "id": 39,
+        "item": "Pleated trousers",
+        "color": "navy",
+        "brand": "Selected",
+        "season": "spring/summer",
+        "size": "50",
+        "materials": [
+          "cotton",
+          "linen"
+        ],
+        "sku": null,
+        "photo": "images/trousers/39_trousers_navy_selected.webp",
+        "link": null
+      },
+      {
+        "id": 40,
+        "item": "Linen trousers",
+        "color": "beige",
+        "brand": "Zara",
+        "season": "summer",
+        "size": "L",
+        "materials": [
+          "linen"
+        ],
+        "sku": null,
+        "photo": "images/trousers/40_trousers_linen_beige.webp",
+        "link": null
+      },
+      {
+        "id": 41,
+        "item": "Classic trousers with belt",
+        "color": "grey",
+        "brand": "Ionel",
+        "season": "all-season",
+        "size": "50",
+        "materials": [
+          "wool"
+        ],
+        "sku": null,
+        "photo": "images/trousers/41_trousers_grey_belt.webp",
+        "link": null
+      },
+      {
+        "id": 42,
+        "item": "Classic trousers",
+        "color": "charcoal",
+        "brand": "Ionel",
+        "season": "all-season",
+        "size": "50",
+        "materials": [
+          "wool"
+        ],
+        "sku": null,
+        "photo": "images/trousers/42_trousers_dark.webp",
+        "link": null
+      },
+      {
+        "id": 43,
+        "item": "Pleated trousers (linen)",
+        "color": "beige/cream",
+        "brand": "C&A",
+        "season": "summer",
+        "size": null,
+        "materials": [
+          "linen",
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/trousers/43_trousers_linen_cream.webp",
+        "link": null
+      }
+    ],
+    "shoes": [
+      {
+        "id": 44,
+        "item": "Suede desert boots",
+        "color": "dark brown",
+        "brand": "Denis",
+        "season": "fall/winter",
+        "size": "42",
+        "materials": [
+          "suede"
+        ],
+        "sku": null,
+        "photo": "images/shoes/44_boots_desert_brown.webp",
+        "link": null
+      },
+      {
+        "id": 45,
+        "item": "Suede platform loafers",
+        "color": "tan/beige",
+        "brand": "Massimo Dutti",
+        "season": "spring/summer",
+        "size": "42",
+        "materials": [
+          "suede"
+        ],
+        "sku": null,
+        "photo": "images/shoes/45_loafers_suede_beige.webp",
+        "link": null
+      },
+      {
+        "id": 46,
+        "item": "Espadrilles",
+        "color": "blue",
+        "brand": "Ushuaia",
+        "season": "summer",
+        "size": "42",
+        "materials": [
+          "cotton",
+          "jute"
+        ],
+        "sku": null,
+        "photo": "images/shoes/46_espadrilles_blue.webp",
+        "link": null
+      },
+      {
+        "id": 47,
+        "item": "Leather sneakers",
+        "color": "white",
+        "brand": "Clarks Craft",
+        "season": "spring/summer",
+        "size": "42",
+        "materials": [
+          "leather"
+        ],
+        "sku": null,
+        "photo": "images/shoes/47_sneakers_clarks_white.webp",
+        "link": null
+      },
+      {
+        "id": 48,
+        "item": "Casual nubuck derby",
+        "color": "black",
+        "brand": "ECCO",
+        "season": "all-season",
+        "size": "42",
+        "materials": [
+          "nubuck"
+        ],
+        "sku": null,
+        "photo": "images/shoes/48_shoes_ecco_black.webp",
+        "link": null
+      },
+      {
+        "id": 49,
+        "item": "997 Sneakers",
+        "color": "grey",
+        "brand": "New Balance",
+        "season": "all-season",
+        "size": "42.5",
+        "materials": [
+          "suede",
+          "textile"
+        ],
+        "sku": "CM997H",
+        "photo": "images/shoes/49_sneakers_nb997.webp",
+        "link": "https://www.newbalance.it/en/pd/997h/CM997HV1-44227-EMEA-CM997HQL.html"
+      },
+      {
+        "id": 50,
+        "item": "Minimalist sneakers",
+        "color": "grey",
+        "brand": "Camper",
+        "season": "spring/summer",
+        "size": "42",
+        "materials": [
+          "leather"
+        ],
+        "sku": null,
+        "photo": "images/shoes/50_sneakers_camper_grey.webp",
+        "link": null
+      },
+      {
+        "id": 51,
+        "item": "Arizona sandals",
+        "color": "brown",
+        "brand": "Birkenstock",
+        "season": "summer",
+        "size": "41",
+        "materials": [
+          "suede"
+        ],
+        "sku": "051101",
+        "photo": "images/shoes/51_sandals_birkenstock.webp",
+        "link": "https://tandashoes.com/products/birkenstock-arizona-brown"
+      }
+    ],
+    "watches": [
+      {
+        "id": 52,
+        "item": "F-91W-1",
+        "color": "black",
+        "brand": "Casio",
+        "season": "all-season",
+        "size": null,
+        "materials": [
+          "resin"
+        ],
+        "sku": "F-91W-1",
+        "photo": "images/watches/52_watch_casio_black.webp",
+        "link": "https://www.casio.com/intl/watches/casio/product.F-91W-1/"
+      },
+      {
+        "id": 53,
+        "item": "F-91WM-3A",
+        "color": "green/black",
+        "brand": "Casio",
+        "season": "all-season",
+        "size": null,
+        "materials": [
+          "resin"
+        ],
+        "sku": "F-91WM-3A",
+        "photo": "images/watches/53_watch_casio_green.webp",
+        "link": "https://www.casio.com/us/watches/casio/product.F-91WM-3A/"
+      }
+    ],
+    "headwear": [
+      {
+        "id": 54,
+        "item": "G letter cap",
+        "color": "dark green",
+        "brand": "GANT",
+        "season": "spring/summer",
+        "size": null,
+        "materials": [
+          "wool",
+          "polyester"
+        ],
+        "sku": null,
+        "photo": "images/headwear/54_cap_gant_green.webp",
+        "link": null
+      },
+      {
+        "id": 55,
+        "item": "Embroidered cap (anime)",
+        "color": "black",
+        "brand": "—",
+        "season": "spring/summer",
+        "size": null,
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/headwear/55_cap_anime_black.webp",
+        "link": null
+      },
+      {
+        "id": 56,
+        "item": "Lightweight cap",
+        "color": "grey",
+        "brand": "SesVanderHave",
+        "season": "summer",
+        "size": null,
+        "materials": [
+          "polyester"
+        ],
+        "sku": null,
+        "photo": "images/headwear/56_cap_sesvanderhave_grey.webp",
+        "link": null
+      },
+      {
+        "id": 57,
+        "item": "Snapback cap",
+        "color": "navy/red",
+        "brand": "Herschel",
+        "season": "spring/summer",
+        "size": null,
+        "materials": [
+          "cotton"
+        ],
+        "sku": null,
+        "photo": "images/headwear/57_cap_herschel_navy_red.webp",
+        "link": null
+      },
+      {
+        "id": 58,
+        "item": "Beanie",
+        "color": "dark green",
+        "brand": "Barts",
+        "season": "winter",
+        "size": null,
+        "materials": [
+          "polyester"
+        ],
+        "sku": null,
+        "photo": "images/headwear/58_beanie_barts_green.webp",
+        "link": null
+      }
+    ],
+    "scarves": [
+      {
+        "id": 59,
+        "item": "Lightweight scarf",
+        "color": "navy",
+        "brand": "—",
+        "season": "fall/winter",
+        "size": null,
+        "materials": [
+          "alpaca wool"
+        ],
+        "sku": null,
+        "photo": "images/scarves/59_scarf_navy.webp",
+        "link": null
+      },
+      {
+        "id": 60,
+        "item": "Wool scarf with fringe",
+        "color": "grey/olive",
+        "brand": "Massimo Dutti",
+        "season": "winter",
+        "size": null,
+        "materials": [
+          "wool"
+        ],
+        "sku": null,
+        "photo": "images/scarves/60_scarf_grey_wool.webp",
+        "link": null
+      }
+    ],
+    "eyewear": [
+      {
+        "id": 61,
+        "item": "Polarized sunglasses",
+        "color": "black",
+        "brand": "POLAR",
+        "season": "summer",
+        "size": null,
+        "materials": [
+          "acetate"
+        ],
+        "sku": null,
+        "photo": "images/eyewear/61_sunglasses_polar.webp",
+        "link": null
+      }
+    ],
+    "wallets": [
+      {
+        "id": 62,
+        "item": "Compact wallet",
+        "color": "dark green",
+        "brand": "Bellroy",
+        "season": "all-season",
+        "size": null,
+        "materials": [
+          "leather"
+        ],
+        "sku": "WCSA",
+        "photo": "images/wallets/62_wallet_bellroy_green.webp",
+        "link": "https://bellroy.com/products/compact-wallet"
+      }
+    ],
+    "bags": [
+      {
+        "id": 63,
+        "item": "Belt/crossbody bag",
+        "color": "black",
+        "brand": "—",
+        "season": "all-season",
+        "size": null,
+        "materials": [
+          "nylon"
+        ],
+        "sku": null,
+        "photo": "images/bags/63_bag_crossbody_black.webp",
+        "link": null
+      },
+      {
+        "id": 64,
+        "item": "Small shoulder bag",
+        "color": "black",
+        "brand": "Tergan",
+        "season": "all-season",
+        "size": null,
+        "materials": [
+          "leather"
+        ],
+        "sku": null,
+        "photo": "images/bags/64_bag_shoulder_black.webp",
+        "link": null
+      },
+      {
+        "id": 65,
+        "item": "Backpack",
+        "color": "black",
+        "brand": "Thule",
+        "season": "all-season",
+        "size": null,
+        "materials": [
+          "nylon"
+        ],
+        "sku": null,
+        "photo": "images/bags/65_backpack_thule.webp",
+        "link": null
+      },
+      {
+        "id": 66,
+        "item": "Helmet bag",
+        "color": "black",
+        "brand": "Flyboys",
+        "season": "all-season",
+        "size": null,
+        "materials": [
+          "nylon"
+        ],
+        "sku": null,
+        "photo": "images/bags/66_garment_bag_flyboys.webp",
+        "link": "https://pivotcase.com/products/flyboys-jumbo-helmet-bag"
+      }
+    ]
+  }
+}

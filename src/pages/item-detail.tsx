@@ -1,0 +1,133 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams, Link } from "react-router";
+import { doc, onSnapshot } from "firebase/firestore";
+import { auth, db } from "../firebase.ts";
+import { updateItem, deleteItem } from "../firebase-db.ts";
+import { CATEGORIES } from "../categories.ts";
+import type { CategoryType } from "../categories.ts";
+import type { WardrobeItem, WardrobeItemDB } from "../types.ts";
+import { ItemForm } from "../components/item-form.tsx";
+
+export function ItemDetail() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [item, setItem] = useState<WardrobeItemDB | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const uid = auth.currentUser?.uid;
+    if (!uid || !id) return;
+    return onSnapshot(doc(db, "users", uid, "items", id), (snap) => {
+      if (snap.exists()) {
+        setItem({ id: snap.id, ...snap.data() } as WardrobeItemDB);
+      } else {
+        setItem(null);
+      }
+      setLoading(false);
+    });
+  }, [id]);
+
+  if (loading) return <div className="text-center text-muted py-8">Loading...</div>;
+  if (!item) return <div className="text-center text-muted py-8">Item not found</div>;
+
+  if (editing) {
+    return (
+      <div>
+        <button
+          type="button"
+          onClick={() => setEditing(false)}
+          className="text-sm text-muted hover:text-canvas-text mb-4"
+        >
+          &larr; Cancel editing
+        </button>
+        <ItemForm
+          defaultValues={item}
+          submitLabel="Save Changes"
+          onSubmit={async (data: WardrobeItem, photoFile) => {
+            await updateItem(item.id, data, photoFile);
+            setEditing(false);
+          }}
+          onDelete={async () => {
+            await deleteItem(item.id);
+            navigate("/");
+          }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <Link to="/" className="text-sm text-muted hover:text-canvas-text mb-4 inline-block">
+        &larr; Back
+      </Link>
+
+      <div className="sm:flex gap-6">
+        {/* Photo */}
+        <div className="sm:w-64 shrink-0 mb-4 sm:mb-0">
+          {item.photo ? (
+            <img
+              src={item.photo}
+              alt={item.item}
+              className="w-full aspect-square object-cover rounded-lg"
+            />
+          ) : (
+            <div className="w-full aspect-square bg-border/30 rounded-lg flex items-center justify-center text-muted text-sm">
+              no photo
+            </div>
+          )}
+        </div>
+
+        {/* Details */}
+        <div className="flex-1 min-w-0">
+          <h1 className="text-h2 mb-1">{item.item}</h1>
+          <p className="text-muted text-sm mb-4">
+            {item.brand !== "—" ? item.brand : "Unknown brand"}
+          </p>
+
+          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+            <Detail label="Category" value={CATEGORIES[item.category as CategoryType] ?? item.category} />
+            <Detail label="Color" value={item.color} />
+            <Detail label="Season" value={item.season} />
+            <Detail label="Size" value={item.size ?? "—"} />
+            <Detail label="Materials" value={item.materials.length ? item.materials.join(", ") : "—"} />
+            <Detail label="SKU" value={item.sku ?? "—"} />
+            {item.link && (
+              <>
+                <dt className="text-muted">Link</dt>
+                <dd>
+                  <a
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand underline truncate block"
+                  >
+                    {item.link}
+                  </a>
+                </dd>
+              </>
+            )}
+          </dl>
+
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="mt-6 px-5 py-2 rounded-lg bg-brand text-on-accent font-medium text-sm hover:bg-brand-dark transition-colors"
+          >
+            Edit
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Detail({ label, value }: { label: string; value: string }) {
+  return (
+    <>
+      <dt className="text-muted">{label}</dt>
+      <dd>{value}</dd>
+    </>
+  );
+}
