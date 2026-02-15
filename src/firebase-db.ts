@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  getDoc,
   setDoc,
   updateDoc,
   deleteDoc,
@@ -129,6 +130,19 @@ export async function importFromWardrobeJSON(file: File): Promise<number> {
 
   await flush();
   return total;
+}
+
+export async function saveGeminiKey(key: string): Promise<void> {
+  const uid = auth.currentUser?.uid;
+  if (!uid) throw new Error("Not authenticated");
+  await updateDoc(doc(db, "users", uid), { geminiApiKey: key });
+}
+
+export async function getGeminiKey(): Promise<string | null> {
+  const uid = auth.currentUser?.uid;
+  if (!uid) throw new Error("Not authenticated");
+  const snap = await getDoc(doc(db, "users", uid));
+  return (snap.data()?.geminiApiKey as string) ?? null;
 }
 
 export async function exportToJSON(): Promise<void> {

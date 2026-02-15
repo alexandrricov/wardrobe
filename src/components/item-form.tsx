@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CATEGORIES, CATEGORY_ORDER, SEASONS } from "../categories.ts";
 import type { CategoryType } from "../categories.ts";
 import type { WardrobeItem } from "../types.ts";
 import { PhotoUpload } from "./photo-upload.tsx";
+import { analyzePhoto } from "../ai/analyze-photo.ts";
+import { getGeminiKey } from "../firebase-db.ts";
 
 type Props = {
   defaultValues?: Partial<WardrobeItem> & { photo?: string | null };
@@ -19,6 +21,37 @@ export function ItemForm({
 }: Props) {
   const [saving, setSaving] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [aiValues, setAiValues] = useState<Partial<WardrobeItem> | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [formKey, setFormKey] = useState(0);
+
+  const merged = { ...defaultValues, ...aiValues };
+
+  useEffect(() => {
+    setAiValues(null);
+    setAiError(null);
+  }, [photoFile]);
+
+  async function handleAnalyze() {
+    if (!photoFile) return;
+    setAnalyzing(true);
+    setAiError(null);
+    try {
+      const key = await getGeminiKey();
+      if (!key) {
+        setAiError("Add Gemini API key in Settings");
+        return;
+      }
+      const result = await analyzePhoto(photoFile, key);
+      setAiValues(result);
+      setFormKey((k) => k + 1);
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : "Analysis failed");
+    } finally {
+      setAnalyzing(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -58,13 +91,31 @@ export function ItemForm({
         onSelect={setPhotoFile}
       />
 
-      <div className="grid grid-cols-2 gap-3">
+      {photoFile && (
+        <div>
+          <button
+            type="button"
+            disabled={analyzing}
+            onClick={handleAnalyze}
+            className="px-4 py-2 rounded-lg border border-brand text-brand text-sm font-medium hover:bg-brand/5 disabled:opacity-50 transition-colors"
+          >
+            {analyzing ? "Analyzing..." : "Analyze with AI"}
+          </button>
+          {aiError && (
+            <p className="mt-1 text-xs text-red-600" role="alert">
+              {aiError}
+            </p>
+          )}
+        </div>
+      )}
+
+      <div key={formKey} className="grid grid-cols-2 gap-3">
         <label className="col-span-2">
           <span className="text-xs text-muted block mb-1">Item name</span>
           <input
             name="item"
             required
-            defaultValue={defaultValues?.item}
+            defaultValue={merged?.item}
             className="w-full section px-3 py-2 text-sm"
             placeholder="Button-down check shirt"
           />
@@ -74,7 +125,7 @@ export function ItemForm({
           <span className="text-xs text-muted block mb-1">Brand</span>
           <input
             name="brand"
-            defaultValue={defaultValues?.brand ?? ""}
+            defaultValue={merged?.brand ?? ""}
             className="w-full section px-3 py-2 text-sm"
             placeholder="GANT"
           />
@@ -87,7 +138,7 @@ export function ItemForm({
           <input
             name="color"
             required
-            defaultValue={defaultValues?.color?.join(", ")}
+            defaultValue={merged?.color?.join(", ")}
             className="w-full section px-3 py-2 text-sm"
             placeholder="navy, white"
           />
@@ -98,7 +149,7 @@ export function ItemForm({
           <select
             name="category"
             required
-            defaultValue={defaultValues?.category ?? "shirts"}
+            defaultValue={merged?.category ?? "shirts"}
             className="w-full section px-3 py-2 text-sm"
           >
             {CATEGORY_ORDER.map((cat) => (
@@ -114,7 +165,7 @@ export function ItemForm({
           <select
             name="season"
             required
-            defaultValue={defaultValues?.season ?? "all-season"}
+            defaultValue={merged?.season ?? "all-season"}
             className="w-full section px-3 py-2 text-sm"
           >
             {SEASONS.map((s) => (
@@ -129,7 +180,7 @@ export function ItemForm({
           <span className="text-xs text-muted block mb-1">Size</span>
           <input
             name="size"
-            defaultValue={defaultValues?.size ?? ""}
+            defaultValue={merged?.size ?? ""}
             className="w-full section px-3 py-2 text-sm"
             placeholder="M"
           />
@@ -139,7 +190,7 @@ export function ItemForm({
           <span className="text-xs text-muted block mb-1">SKU</span>
           <input
             name="sku"
-            defaultValue={defaultValues?.sku ?? ""}
+            defaultValue={merged?.sku ?? ""}
             className="w-full section px-3 py-2 text-sm"
             placeholder="M3600"
           />
@@ -151,7 +202,7 @@ export function ItemForm({
           </span>
           <input
             name="materials"
-            defaultValue={defaultValues?.materials?.join(", ") ?? ""}
+            defaultValue={merged?.materials?.join(", ") ?? ""}
             className="w-full section px-3 py-2 text-sm"
             placeholder="cotton, linen"
           />
@@ -162,7 +213,7 @@ export function ItemForm({
           <input
             name="link"
             type="url"
-            defaultValue={defaultValues?.link ?? ""}
+            defaultValue={merged?.link ?? ""}
             className="w-full section px-3 py-2 text-sm"
             placeholder="https://..."
           />

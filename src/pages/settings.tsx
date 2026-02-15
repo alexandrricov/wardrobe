@@ -1,14 +1,30 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase.ts";
 import { useAuth } from "../providers/auth.tsx";
-import { importFromWardrobeJSON, exportToJSON } from "../firebase-db.ts";
+import {
+  importFromWardrobeJSON,
+  exportToJSON,
+  saveGeminiKey,
+  getGeminiKey,
+} from "../firebase-db.ts";
 
 export function Settings() {
   const { user } = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState("");
+  const [apiKeyLoaded, setApiKeyLoaded] = useState(false);
+  const [apiKeySaving, setApiKeySaving] = useState(false);
+  const [apiKeyMsg, setApiKeyMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    getGeminiKey().then((key) => {
+      if (key) setApiKey(key);
+      setApiKeyLoaded(true);
+    });
+  }, []);
 
   async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -54,6 +70,61 @@ export function Settings() {
         >
           Sign out
         </button>
+      </div>
+
+      {/* AI */}
+      <div className="section">
+        <h2 className="text-h3 mb-3">AI</h2>
+        <p className="text-sm text-muted mb-3">
+          Gemini API key for photo analysis.{" "}
+          <a
+            href="https://aistudio.google.com/apikey"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand underline"
+          >
+            Get a free key
+          </a>
+        </p>
+        {apiKeyLoaded && (
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setApiKeySaving(true);
+              setApiKeyMsg(null);
+              try {
+                await saveGeminiKey(apiKey.trim());
+                setApiKeyMsg("Saved");
+              } catch {
+                setApiKeyMsg("Failed to save");
+              } finally {
+                setApiKeySaving(false);
+              }
+            }}
+            className="flex gap-2"
+          >
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="AIza..."
+              className="flex-1 section px-3 py-2 text-sm"
+              aria-label="Gemini API key"
+            />
+            <button
+              type="submit"
+              disabled={apiKeySaving}
+              className="px-4 py-2 rounded-lg bg-brand text-on-accent font-medium text-sm hover:bg-brand-dark disabled:opacity-50 transition-colors"
+            >
+              {apiKeySaving ? "Saving..." : "Save"}
+            </button>
+          </form>
+        )}
+        {apiKeyMsg && (
+          <p className="mt-2 text-sm text-muted" role="alert">
+            {apiKeyMsg}
+          </p>
+        )}
       </div>
 
       {/* Import */}
