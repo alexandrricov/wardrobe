@@ -3,8 +3,7 @@ import { useNavigate, useParams, Link } from "react-router";
 import { doc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase.ts";
 import { updateItem, deleteItem } from "../firebase-db.ts";
-import { CATEGORIES } from "../categories.ts";
-import type { CategoryType } from "../categories.ts";
+import { categoryLabel } from "../categories.ts";
 import type { WardrobeItem, WardrobeItemDB } from "../types.ts";
 import { ItemForm } from "../components/item-form.tsx";
 
@@ -87,7 +86,8 @@ export function ItemDetail() {
           </p>
 
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-            <Detail label="Category" value={CATEGORIES[item.category as CategoryType] ?? item.category} />
+            <Detail label="Category" value={categoryLabel(item.category)} />
+            {item.subcategory && <Detail label="Subcategory" value={item.subcategory} />}
             <Detail label="Color" value={item.color.join(", ")} />
             <Detail label="Season" value={item.season.join(", ")} />
             <Detail label="Size" value={item.size ?? "—"} />

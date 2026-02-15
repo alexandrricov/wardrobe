@@ -4,15 +4,22 @@ import type { CategoryType } from "../categories.ts";
 export type AnalysisResult = {
   item: string;
   category: CategoryType;
+  subcategory: string | null;
   color: string[];
   brand: string | null;
   season: string[];
   materials: string[];
 };
 
+const SUBCATEGORY_HINT = Object.entries(CATEGORIES)
+  .map(([cat, subs]) => `  ${cat}: [${subs.join(", ")}]`)
+  .join("\n");
+
 const PROMPT = `You are a fashion expert. Analyze this clothing/accessory photo and return a JSON object with these fields:
 - "item": short name (e.g. "Oxford shirt", "Desert boots")
 - "category": one of [${Object.keys(CATEGORIES).join(", ")}]
+- "subcategory": one of the values below based on category, or null if unsure:
+${SUBCATEGORY_HINT}
 - "color": array of colors (e.g. ["navy", "white"])
 - "brand": brand name if visible, otherwise null
 - "season": array of applicable seasons from [${SEASONS.join(", ")}]

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { subscribeItems } from "../firebase-db.ts";
-import { CATEGORIES, CATEGORY_ORDER, SEASONS } from "../categories.ts";
+import { CATEGORY_ORDER, SEASONS, categoryLabel } from "../categories.ts";
 import type { CategoryType } from "../categories.ts";
 import type { WardrobeItemDB } from "../types.ts";
 import { ItemCard } from "../components/item-card.tsx";
@@ -66,7 +66,7 @@ export function Gallery() {
             active={category === cat}
             onClick={() => setCategory(cat)}
           >
-            {CATEGORIES[cat]}
+            {categoryLabel(cat)}
           </Pill>
         ))}
       </div>
@@ -87,7 +87,7 @@ export function Gallery() {
       {CATEGORY_ORDER.filter((cat) => grouped.has(cat)).map((cat) => (
         <section key={cat} className="mb-8">
           <h2 className="text-h3 mb-3 pb-2 border-b border-border">
-            {CATEGORIES[cat]}
+            {categoryLabel(cat)}
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {grouped.get(cat)!.map((item) => (

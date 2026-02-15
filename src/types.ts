@@ -12,6 +12,7 @@ export type WardrobeItem = {
   photo: string | null;
   link: string | null;
   category: CategoryType;
+  subcategory: string | null;
 };
 
 export type WardrobeItemDB = WardrobeItem & {

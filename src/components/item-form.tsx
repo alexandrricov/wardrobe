@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { CATEGORIES, CATEGORY_ORDER, SEASONS } from "../categories.ts";
-import type { CategoryType } from "../categories.ts";
+import { CATEGORIES, CATEGORY_ORDER, SEASONS, categoryLabel, categoryOf } from "../categories.ts";
 import type { WardrobeItem } from "../types.ts";
 import { PhotoUpload } from "./photo-upload.tsx";
 import { analyzePhoto } from "../ai/analyze-photo.ts";
@@ -29,6 +28,12 @@ export function ItemForm({
   const [selectedSeasons, setSelectedSeasons] = useState<string[]>(
     defaultValues?.season ?? [...SEASONS],
   );
+  const [selectedValue, setSelectedValue] = useState(
+    defaultValues?.subcategory ?? defaultValues?.category ?? "tops",
+  );
+  const isParent = (CATEGORY_ORDER as string[]).includes(selectedValue);
+  const selectedCategory = isParent ? (selectedValue as CategoryType) : categoryOf(selectedValue);
+  const selectedSubcategory = isParent ? null : selectedValue;
 
   const merged = { ...defaultValues, ...aiValues };
 
@@ -58,6 +63,11 @@ export function ItemForm({
       const result = await analyzePhoto(photoSource, key);
       setAiValues(result);
       if (result.season) setSelectedSeasons(result.season);
+      if (result.subcategory) {
+        setSelectedValue(result.subcategory);
+      } else if (result.category) {
+        setSelectedValue(result.category);
+      }
       setFormKey((k) => k + 1);
     } catch (err) {
       setAiError(err instanceof Error ? err.message : "Analysis failed");
@@ -87,7 +97,8 @@ export function ItemForm({
       sku: (fd.get("sku") as string).trim() || null,
       photo: defaultValues?.photo ?? null,
       link: (fd.get("link") as string).trim() || null,
-      category: fd.get("category") as CategoryType,
+      category: selectedCategory,
+      subcategory: selectedSubcategory,
     };
 
     try {
@@ -160,15 +171,19 @@ export function ItemForm({
         <label>
           <span className="text-xs text-muted block mb-1">Category</span>
           <select
-            name="category"
-            required
-            defaultValue={merged?.category ?? "tops"}
+            value={selectedValue}
+            onChange={(e) => setSelectedValue(e.target.value)}
             className="w-full section px-3 py-2 text-sm"
           >
             {CATEGORY_ORDER.map((cat) => (
-              <option key={cat} value={cat}>
-                {CATEGORIES[cat]}
-              </option>
+              <optgroup key={cat} label={categoryLabel(cat)}>
+                <option value={cat}>—</option>
+                {CATEGORIES[cat].map((sub) => (
+                  <option key={sub} value={sub}>
+                    {sub}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </label>

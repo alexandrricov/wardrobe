@@ -139,6 +139,7 @@ export async function importFromWardrobeJSON(file: File): Promise<number> {
       photo: (i.photo as string | null) ?? null,
       link: (i.link as string | null) ?? null,
       category: (i.category as string) ?? "tops",
+      subcategory: (i.subcategory as string | null) ?? null,
       createdAt: serverTimestamp(),
     });
     inBatch++;
@@ -174,6 +175,7 @@ export async function exportToJSON(): Promise<void> {
   const exported = items.map((item) => ({
     item: item.item,
     category: item.category,
+    subcategory: item.subcategory,
     color: item.color,
     brand: item.brand,
     season: item.season,
