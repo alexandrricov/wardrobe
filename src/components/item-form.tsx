@@ -5,6 +5,7 @@ import type { WardrobeItem } from "../types.ts";
 import { PhotoUpload } from "./photo-upload.tsx";
 import { analyzePhoto } from "../ai/analyze-photo.ts";
 import { getGeminiKey } from "../firebase-db.ts";
+import clsx from "clsx";
 
 type Props = {
   defaultValues?: Partial<WardrobeItem> & { photo?: string | null };
@@ -25,6 +26,9 @@ export function ItemForm({
   const [analyzing, setAnalyzing] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [formKey, setFormKey] = useState(0);
+  const [selectedSeasons, setSelectedSeasons] = useState<string[]>(
+    defaultValues?.season ?? [...SEASONS],
+  );
 
   const merged = { ...defaultValues, ...aiValues };
 
@@ -32,6 +36,12 @@ export function ItemForm({
     setAiValues(null);
     setAiError(null);
   }, [photoFile]);
+
+  function toggleSeason(s: string) {
+    setSelectedSeasons((prev) =>
+      prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s],
+    );
+  }
 
   async function handleAnalyze() {
     if (!photoFile) return;
@@ -45,6 +55,7 @@ export function ItemForm({
       }
       const result = await analyzePhoto(photoFile, key);
       setAiValues(result);
+      if (result.season) setSelectedSeasons(result.season);
       setFormKey((k) => k + 1);
     } catch (err) {
       setAiError(err instanceof Error ? err.message : "Analysis failed");
@@ -65,7 +76,7 @@ export function ItemForm({
         .map((s) => s.trim())
         .filter(Boolean),
       brand: (fd.get("brand") as string).trim() || null,
-      season: fd.get("season") as string,
+      season: selectedSeasons,
       size: (fd.get("size") as string).trim() || null,
       materials: (fd.get("materials") as string)
         .split(",")
@@ -160,21 +171,31 @@ export function ItemForm({
           </select>
         </label>
 
-        <label>
-          <span className="text-xs text-muted block mb-1">Season</span>
-          <select
-            name="season"
-            required
-            defaultValue={merged?.season ?? "all-season"}
-            className="w-full section px-3 py-2 text-sm"
-          >
+        <fieldset className="col-span-2">
+          <legend className="text-xs text-muted mb-1">Season</legend>
+          <div className="flex flex-wrap gap-1.5">
             {SEASONS.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
+              <label key={s}>
+                <input
+                  type="checkbox"
+                  checked={selectedSeasons.includes(s)}
+                  onChange={() => toggleSeason(s)}
+                  className="sr-only"
+                />
+                <span
+                  className={clsx(
+                    "px-3 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer select-none",
+                    selectedSeasons.includes(s)
+                      ? "bg-brand text-on-accent border-brand"
+                      : "bg-transparent text-muted border-border hover:border-muted",
+                  )}
+                >
+                  {s}
+                </span>
+              </label>
             ))}
-          </select>
-        </label>
+          </div>
+        </fieldset>
 
         <label>
           <span className="text-xs text-muted block mb-1">Size</span>

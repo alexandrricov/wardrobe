@@ -89,7 +89,7 @@ export function ItemDetail() {
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
             <Detail label="Category" value={CATEGORIES[item.category as CategoryType] ?? item.category} />
             <Detail label="Color" value={item.color.join(", ")} />
-            <Detail label="Season" value={item.season} />
+            <Detail label="Season" value={item.season.join(", ")} />
             <Detail label="Size" value={item.size ?? "—"} />
             <Detail label="Materials" value={item.materials.length ? item.materials.join(", ") : "—"} />
             <Detail label="SKU" value={item.sku ?? "—"} />

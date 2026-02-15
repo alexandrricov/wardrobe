@@ -21,11 +21,9 @@ export type CategoryType = keyof typeof CATEGORIES;
 export const CATEGORY_ORDER = Object.keys(CATEGORIES) as CategoryType[];
 
 export const SEASONS = [
-  "all-season",
-  "spring/summer",
-  "spring/fall",
+  "spring",
   "summer",
-  "fall/winter",
+  "fall",
   "winter",
 ] as const;
 

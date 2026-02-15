@@ -5,7 +5,7 @@ export type WardrobeItem = {
   item: string;
   color: string[];
   brand: string | null;
-  season: string;
+  season: string[];
   size: string | null;
   materials: string[];
   sku: string | null;

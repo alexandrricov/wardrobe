@@ -18,7 +18,7 @@ export function Gallery() {
     const q = search.toLowerCase();
     return items.filter((item) => {
       if (category !== "all" && item.category !== category) return false;
-      if (season !== "all" && item.season !== season) return false;
+      if (season !== "all" && !item.season.includes(season)) return false;
       if (
         q &&
         !item.item.toLowerCase().includes(q) &&

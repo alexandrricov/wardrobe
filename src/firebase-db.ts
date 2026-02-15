@@ -113,7 +113,7 @@ export async function importFromWardrobeJSON(file: File): Promise<number> {
         item: (i.item as string) ?? "",
         color: i.color as string[],
         brand: (i.brand as string | null) || null,
-        season: (i.season as string) ?? "",
+        season: i.season as string[],
         size: (i.size as string | null) ?? null,
         materials: Array.isArray(i.materials) ? i.materials : [],
         sku: (i.sku as string | null) ?? null,

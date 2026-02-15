@@ -6,7 +6,7 @@ export type AnalysisResult = {
   category: CategoryType;
   color: string[];
   brand: string | null;
-  season: string;
+  season: string[];
   materials: string[];
 };
 
@@ -15,7 +15,7 @@ const PROMPT = `You are a fashion expert. Analyze this clothing/accessory photo 
 - "category": one of [${Object.keys(CATEGORIES).join(", ")}]
 - "color": array of colors (e.g. ["navy", "white"])
 - "brand": brand name if visible, otherwise null
-- "season": one of [${SEASONS.join(", ")}]
+- "season": array of applicable seasons from [${SEASONS.join(", ")}]
 - "materials": array of likely materials (e.g. ["cotton", "linen"])
 
 Return ONLY valid JSON, no markdown fences.`;
