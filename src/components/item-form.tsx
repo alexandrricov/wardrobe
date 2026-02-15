@@ -162,7 +162,7 @@ export function ItemForm({
           <select
             name="category"
             required
-            defaultValue={merged?.category ?? "shirts"}
+            defaultValue={merged?.category ?? "tops"}
             className="w-full section px-3 py-2 text-sm"
           >
             {CATEGORY_ORDER.map((cat) => (

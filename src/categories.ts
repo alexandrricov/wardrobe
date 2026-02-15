@@ -1,20 +1,11 @@
 export const CATEGORIES = {
-  shirts: "Shirts",
-  polos: "Polos",
-  tshirts: "T-shirts",
+  tops: "Tops",
   knitwear: "Knitwear",
-  overshirts: "Overshirts",
-  blazers: "Blazers",
-  jackets: "Jackets",
-  jeans: "Jeans",
-  trousers: "Trousers",
+  outerwear: "Outerwear",
+  bottoms: "Bottoms",
   shoes: "Shoes",
-  watches: "Watches",
-  headwear: "Headwear",
-  scarves: "Scarves",
-  eyewear: "Eyewear",
-  wallets: "Wallets",
   bags: "Bags",
+  accessories: "Accessories",
 } as const;
 
 export type CategoryType = keyof typeof CATEGORIES;

@@ -106,12 +106,10 @@ export async function importFromWardrobeJSON(file: File): Promise<number> {
   if (!uid) throw new Error("Not authenticated");
 
   const text = await file.text();
-  const raw = JSON.parse(text) as {
-    categories?: Record<string, unknown[]>;
-  };
+  const raw = JSON.parse(text) as { items?: unknown[] };
 
-  if (!raw.categories || typeof raw.categories !== "object") {
-    throw new Error("Invalid wardrobe.json: missing categories");
+  if (!Array.isArray(raw.items)) {
+    throw new Error("Invalid wardrobe.json: missing items array");
   }
 
   const col = collection(db, "users", uid, "items");
@@ -127,29 +125,25 @@ export async function importFromWardrobeJSON(file: File): Promise<number> {
     }
   };
 
-  for (const [category, items] of Object.entries(raw.categories)) {
-    if (!Array.isArray(items)) continue;
-
-    for (const item of items) {
-      const i = item as Record<string, unknown>;
-      const newRef = doc(col);
-      batch.set(newRef, {
-        item: (i.item as string) ?? "",
-        color: i.color as string[],
-        brand: (i.brand as string | null) || null,
-        season: i.season as string[],
-        size: (i.size as string | null) ?? null,
-        materials: Array.isArray(i.materials) ? i.materials : [],
-        sku: (i.sku as string | null) ?? null,
-        photo: (i.photo as string | null) ?? null,
-        link: (i.link as string | null) ?? null,
-        category,
-        createdAt: serverTimestamp(),
-      });
-      inBatch++;
-      total++;
-      if (inBatch >= 400) await flush();
-    }
+  for (const item of raw.items) {
+    const i = item as Record<string, unknown>;
+    const newRef = doc(col);
+    batch.set(newRef, {
+      item: (i.item as string) ?? "",
+      color: i.color as string[],
+      brand: (i.brand as string | null) || null,
+      season: i.season as string[],
+      size: (i.size as string | null) ?? null,
+      materials: Array.isArray(i.materials) ? i.materials : [],
+      sku: (i.sku as string | null) ?? null,
+      photo: (i.photo as string | null) ?? null,
+      link: (i.link as string | null) ?? null,
+      category: (i.category as string) ?? "tops",
+      createdAt: serverTimestamp(),
+    });
+    inBatch++;
+    total++;
+    if (inBatch >= 400) await flush();
   }
 
   await flush();
@@ -177,26 +171,22 @@ export async function exportToJSON(): Promise<void> {
     });
   });
 
-  const categories: Record<string, unknown[]> = {};
-  for (const item of items) {
-    if (!categories[item.category]) categories[item.category] = [];
-    categories[item.category].push({
-      id: item.id,
-      item: item.item,
-      color: item.color,
-      brand: item.brand,
-      season: item.season,
-      size: item.size,
-      materials: item.materials,
-      sku: item.sku,
-      photo: item.photo,
-      link: item.link,
-      createdAt: (item.createdAt as Timestamp)?.toDate?.()?.toISOString() ?? null,
-    });
-  }
+  const exported = items.map((item) => ({
+    item: item.item,
+    category: item.category,
+    color: item.color,
+    brand: item.brand,
+    season: item.season,
+    size: item.size,
+    materials: item.materials,
+    sku: item.sku,
+    photo: item.photo,
+    link: item.link,
+    createdAt: (item.createdAt as Timestamp)?.toDate?.()?.toISOString() ?? null,
+  }));
 
   const blob = new Blob(
-    [JSON.stringify({ categories }, null, 2)],
+    [JSON.stringify({ items: exported }, null, 2)],
     { type: "application/json" },
   );
   const url = URL.createObjectURL(blob);
