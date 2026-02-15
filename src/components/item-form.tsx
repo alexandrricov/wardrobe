@@ -4,7 +4,7 @@ import type { CategoryType } from "../categories.ts";
 import type { WardrobeItem } from "../types.ts";
 import { PhotoUpload } from "./photo-upload.tsx";
 import { analyzePhoto } from "../ai/analyze-photo.ts";
-import { getGeminiKey } from "../firebase-db.ts";
+import { getAiApiKey } from "../firebase-db.ts";
 import clsx from "clsx";
 
 type Props = {
@@ -43,17 +43,19 @@ export function ItemForm({
     );
   }
 
+  const photoSource = photoFile ?? defaultValues?.photo ?? null;
+
   async function handleAnalyze() {
-    if (!photoFile) return;
+    if (!photoSource) return;
     setAnalyzing(true);
     setAiError(null);
     try {
-      const key = await getGeminiKey();
+      const key = await getAiApiKey();
       if (!key) {
-        setAiError("Add Gemini API key in Settings");
+        setAiError("Add OpenRouter API key in Settings");
         return;
       }
-      const result = await analyzePhoto(photoFile, key);
+      const result = await analyzePhoto(photoSource, key);
       setAiValues(result);
       if (result.season) setSelectedSeasons(result.season);
       setFormKey((k) => k + 1);
@@ -102,7 +104,7 @@ export function ItemForm({
         onSelect={setPhotoFile}
       />
 
-      {photoFile && (
+      {photoSource && (
         <div>
           <button
             type="button"
@@ -171,6 +173,16 @@ export function ItemForm({
           </select>
         </label>
 
+        <label>
+          <span className="text-xs text-muted block mb-1">Size</span>
+          <input
+            name="size"
+            defaultValue={merged?.size ?? ""}
+            className="w-full section px-3 py-2 text-sm"
+            placeholder="M"
+          />
+        </label>
+
         <fieldset className="col-span-2">
           <legend className="text-xs text-muted mb-1">Season</legend>
           <div className="flex flex-wrap gap-1.5">
@@ -198,16 +210,6 @@ export function ItemForm({
         </fieldset>
 
         <label>
-          <span className="text-xs text-muted block mb-1">Size</span>
-          <input
-            name="size"
-            defaultValue={merged?.size ?? ""}
-            className="w-full section px-3 py-2 text-sm"
-            placeholder="M"
-          />
-        </label>
-
-        <label>
           <span className="text-xs text-muted block mb-1">SKU</span>
           <input
             name="sku"
@@ -217,10 +219,8 @@ export function ItemForm({
           />
         </label>
 
-        <label className="col-span-2">
-          <span className="text-xs text-muted block mb-1">
-            Materials (comma-separated)
-          </span>
+        <label>
+          <span className="text-xs text-muted block mb-1">Materials</span>
           <input
             name="materials"
             defaultValue={merged?.materials?.join(", ") ?? ""}

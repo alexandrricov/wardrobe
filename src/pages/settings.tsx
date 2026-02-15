@@ -5,14 +5,16 @@ import { useAuth } from "../providers/auth.tsx";
 import {
   importFromWardrobeJSON,
   exportToJSON,
-  saveGeminiKey,
-  getGeminiKey,
+  clearAllItems,
+  saveAiApiKey,
+  getAiApiKey,
 } from "../firebase-db.ts";
 
 export function Settings() {
   const { user } = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState("");
   const [apiKeyLoaded, setApiKeyLoaded] = useState(false);
@@ -20,7 +22,7 @@ export function Settings() {
   const [apiKeyMsg, setApiKeyMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    getGeminiKey().then((key) => {
+    getAiApiKey().then((key) => {
       if (key) setApiKey(key);
       setApiKeyLoaded(true);
     });
@@ -76,9 +78,9 @@ export function Settings() {
       <div className="section">
         <h2 className="text-h3 mb-3">AI</h2>
         <p className="text-sm text-muted mb-3">
-          Gemini API key for photo analysis.{" "}
+          OpenRouter API key for photo analysis.{" "}
           <a
-            href="https://aistudio.google.com/apikey"
+            href="https://openrouter.ai/keys"
             target="_blank"
             rel="noopener noreferrer"
             className="text-brand underline"
@@ -93,7 +95,7 @@ export function Settings() {
               setApiKeySaving(true);
               setApiKeyMsg(null);
               try {
-                await saveGeminiKey(apiKey.trim());
+                await saveAiApiKey(apiKey.trim());
                 setApiKeyMsg("Saved");
               } catch {
                 setApiKeyMsg("Failed to save");
@@ -107,9 +109,9 @@ export function Settings() {
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              placeholder="AIza..."
+              placeholder="sk-or-..."
               className="flex-1 section px-3 py-2 text-sm"
-              aria-label="Gemini API key"
+              aria-label="OpenRouter API key"
             />
             <button
               type="submit"
@@ -141,13 +143,34 @@ export function Settings() {
           onChange={handleImport}
           className="hidden"
         />
-        <button
-          onClick={() => fileRef.current?.click()}
-          disabled={importing}
-          className="px-4 py-2 rounded-lg bg-brand text-on-accent font-medium text-sm hover:bg-brand-dark disabled:opacity-50 transition-colors"
-        >
-          {importing ? "Importing..." : "Import wardrobe.json"}
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => fileRef.current?.click()}
+            disabled={importing || clearing}
+            className="px-4 py-2 rounded-lg bg-brand text-on-accent font-medium text-sm hover:bg-brand-dark disabled:opacity-50 transition-colors"
+          >
+            {importing ? "Importing..." : "Import wardrobe.json"}
+          </button>
+          <button
+            onClick={async () => {
+              if (!confirm("Delete ALL items from your wardrobe? This cannot be undone.")) return;
+              setClearing(true);
+              setMessage(null);
+              try {
+                const count = await clearAllItems();
+                setMessage(`Cleared ${count} items.`);
+              } catch (err) {
+                setMessage(`Clear failed: ${err instanceof Error ? err.message : "Unknown error"}`);
+              } finally {
+                setClearing(false);
+              }
+            }}
+            disabled={importing || clearing}
+            className="px-4 py-2 rounded-lg border border-red-300 text-red-600 text-sm font-medium hover:bg-red-50 disabled:opacity-50 transition-colors"
+          >
+            {clearing ? "Clearing..." : "Clear all"}
+          </button>
+        </div>
         {message && (
           <p
             className="mt-3 text-sm"

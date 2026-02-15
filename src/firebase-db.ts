@@ -2,6 +2,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   setDoc,
   updateDoc,
   deleteDoc,
@@ -77,6 +78,29 @@ export function subscribeItems(
   });
 }
 
+export async function clearAllItems(): Promise<number> {
+  const col = itemsCol();
+  const snap = await getDocs(col);
+  if (snap.empty) return 0;
+
+  let batch = writeBatch(db);
+  let inBatch = 0;
+  let total = 0;
+
+  for (const d of snap.docs) {
+    batch.delete(d.ref);
+    inBatch++;
+    total++;
+    if (inBatch >= 400) {
+      await batch.commit();
+      batch = writeBatch(db);
+      inBatch = 0;
+    }
+  }
+  if (inBatch > 0) await batch.commit();
+  return total;
+}
+
 export async function importFromWardrobeJSON(file: File): Promise<number> {
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error("Not authenticated");
@@ -132,17 +156,17 @@ export async function importFromWardrobeJSON(file: File): Promise<number> {
   return total;
 }
 
-export async function saveGeminiKey(key: string): Promise<void> {
+export async function saveAiApiKey(key: string): Promise<void> {
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error("Not authenticated");
-  await updateDoc(doc(db, "users", uid), { geminiApiKey: key });
+  await updateDoc(doc(db, "users", uid), { aiApiKey: key });
 }
 
-export async function getGeminiKey(): Promise<string | null> {
+export async function getAiApiKey(): Promise<string | null> {
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error("Not authenticated");
   const snap = await getDoc(doc(db, "users", uid));
-  return (snap.data()?.geminiApiKey as string) ?? null;
+  return (snap.data()?.aiApiKey as string) ?? null;
 }
 
 export async function exportToJSON(): Promise<void> {
