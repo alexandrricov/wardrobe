@@ -1,17 +1,18 @@
 import {
+  getStorage,
   ref,
   uploadBytes,
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
-import { storage, auth } from "../firebase.ts";
+import { auth } from "../firebase.ts";
 import type { ImageStorage } from "./types.ts";
 import { compressImage } from "./compress-image.ts";
 
 function getPhotoRef(itemId: string) {
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error("Not authenticated");
-  return ref(storage, `users/${uid}/photos/${itemId}.webp`);
+  return ref(getStorage(), `users/${uid}/photos/${itemId}.webp`);
 }
 
 export const firebaseStorage: ImageStorage = {
