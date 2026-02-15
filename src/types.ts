@@ -3,8 +3,8 @@ import type { CategoryType } from "./categories.ts";
 
 export type WardrobeItem = {
   item: string;
-  color: string;
-  brand: string;
+  color: string[];
+  brand: string | null;
   season: string;
   size: string | null;
   materials: string[];

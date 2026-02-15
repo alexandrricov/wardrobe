@@ -11,7 +11,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { auth, db } from "./firebase.ts";
-import { uploadItemPhoto, deleteItemPhoto } from "./firebase-storage.ts";
+import { imageStorage } from "./storage/index.ts";
 import type { WardrobeItem, WardrobeItemDB } from "./types.ts";
 import type { Timestamp } from "firebase/firestore";
 
@@ -31,7 +31,7 @@ export async function createItem(
 
   let photoURL: string | null = null;
   if (photoFile) {
-    photoURL = await uploadItemPhoto(itemId, photoFile);
+    photoURL = await imageStorage.upload(itemId, photoFile);
   }
 
   await setDoc(newRef, {
@@ -52,14 +52,14 @@ export async function updateItem(
   const patch: Record<string, unknown> = { ...data };
 
   if (newPhotoFile) {
-    patch.photo = await uploadItemPhoto(itemId, newPhotoFile);
+    patch.photo = await imageStorage.upload(itemId, newPhotoFile);
   }
 
   await updateDoc(ref, patch);
 }
 
 export async function deleteItem(itemId: string): Promise<void> {
-  await deleteItemPhoto(itemId);
+  await imageStorage.delete(itemId);
   await deleteDoc(doc(itemsCol(), itemId));
 }
 
@@ -110,13 +110,13 @@ export async function importFromWardrobeJSON(file: File): Promise<number> {
       const newRef = doc(col);
       batch.set(newRef, {
         item: (i.item as string) ?? "",
-        color: (i.color as string) ?? "",
-        brand: (i.brand as string) ?? "",
+        color: i.color as string[],
+        brand: (i.brand as string | null) || null,
         season: (i.season as string) ?? "",
         size: (i.size as string | null) ?? null,
         materials: Array.isArray(i.materials) ? i.materials : [],
         sku: (i.sku as string | null) ?? null,
-        photo: null,
+        photo: (i.photo as string | null) ?? null,
         link: (i.link as string | null) ?? null,
         category,
         createdAt: serverTimestamp(),

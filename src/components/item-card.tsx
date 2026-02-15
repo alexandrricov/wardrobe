@@ -12,7 +12,7 @@ export function ItemCard({ item }: { item: WardrobeItemDB }) {
           src={item.photo}
           alt={item.item}
           loading="lazy"
-          className="w-full aspect-square object-cover"
+          className="w-full aspect-square object-contain"
         />
       ) : (
         <div className="w-full aspect-square bg-border/30 flex items-center justify-center text-muted text-xs">
@@ -23,13 +23,13 @@ export function ItemCard({ item }: { item: WardrobeItemDB }) {
         <div className="text-sm font-medium leading-tight truncate">
           {item.item}
         </div>
-        {item.brand !== "—" && (
+        {item.brand && (
           <div className="text-xs text-muted font-medium mt-0.5 truncate">
             {item.brand}
           </div>
         )}
         <div className="text-xs text-muted mt-0.5 truncate">
-          {item.color}
+          {item.color.join(", ")}
         </div>
       </div>
     </Link>

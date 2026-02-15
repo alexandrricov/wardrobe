@@ -22,8 +22,8 @@ export function Gallery() {
       if (
         q &&
         !item.item.toLowerCase().includes(q) &&
-        !item.brand.toLowerCase().includes(q) &&
-        !item.color.toLowerCase().includes(q)
+        !item.brand?.toLowerCase().includes(q) &&
+        !item.color.some((c) => c.toLowerCase().includes(q))
       )
         return false;
       return true;

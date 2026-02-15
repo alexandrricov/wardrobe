@@ -27,8 +27,11 @@ export function ItemForm({
     const fd = new FormData(e.currentTarget);
     const data: WardrobeItem = {
       item: (fd.get("item") as string).trim(),
-      color: (fd.get("color") as string).trim(),
-      brand: (fd.get("brand") as string).trim(),
+      color: (fd.get("color") as string)
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      brand: (fd.get("brand") as string).trim() || null,
       season: fd.get("season") as string,
       size: (fd.get("size") as string).trim() || null,
       materials: (fd.get("materials") as string)
@@ -71,21 +74,22 @@ export function ItemForm({
           <span className="text-xs text-muted block mb-1">Brand</span>
           <input
             name="brand"
-            required
-            defaultValue={defaultValues?.brand}
+            defaultValue={defaultValues?.brand ?? ""}
             className="w-full section px-3 py-2 text-sm"
             placeholder="GANT"
           />
         </label>
 
         <label>
-          <span className="text-xs text-muted block mb-1">Color</span>
+          <span className="text-xs text-muted block mb-1">
+            Color (comma-separated)
+          </span>
           <input
             name="color"
             required
-            defaultValue={defaultValues?.color}
+            defaultValue={defaultValues?.color?.join(", ")}
             className="w-full section px-3 py-2 text-sm"
-            placeholder="navy"
+            placeholder="navy, white"
           />
         </label>
 

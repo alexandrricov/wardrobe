@@ -29,7 +29,7 @@ export default function App() {
   return (
     <>
       {user ? (
-        <div className="h-full min-h-100dvh grid [grid-template-areas:'main''header'] sm:[grid-template-areas:'header''main'] grid-rows-[1fr_auto] sm:grid-rows-[auto_1fr]">
+        <div className="h-dvh grid [grid-template-areas:'main''header'] sm:[grid-template-areas:'header''main'] grid-rows-[1fr_auto] sm:grid-rows-[auto_1fr]">
           <Header />
           <main className="overflow-y-auto" style={{ gridArea: "main" }}>
             <div className="max-w-4xl mx-auto px-4 py-4 pb-8 w-full">

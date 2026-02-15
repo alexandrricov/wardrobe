@@ -70,7 +70,7 @@ export function ItemDetail() {
             <img
               src={item.photo}
               alt={item.item}
-              className="w-full aspect-square object-cover rounded-lg"
+              className="w-full aspect-square object-contain rounded-lg"
             />
           ) : (
             <div className="w-full aspect-square bg-border/30 rounded-lg flex items-center justify-center text-muted text-sm">
@@ -83,12 +83,12 @@ export function ItemDetail() {
         <div className="flex-1 min-w-0">
           <h1 className="text-h2 mb-1">{item.item}</h1>
           <p className="text-muted text-sm mb-4">
-            {item.brand !== "—" ? item.brand : "Unknown brand"}
+            {item.brand ?? "Unknown brand"}
           </p>
 
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
             <Detail label="Category" value={CATEGORIES[item.category as CategoryType] ?? item.category} />
-            <Detail label="Color" value={item.color} />
+            <Detail label="Color" value={item.color.join(", ")} />
             <Detail label="Season" value={item.season} />
             <Detail label="Size" value={item.size ?? "—"} />
             <Detail label="Materials" value={item.materials.length ? item.materials.join(", ") : "—"} />
