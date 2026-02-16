@@ -19,6 +19,7 @@ import type { ClosetItem, ClosetItemDB } from "./types.ts";
 import type { Timestamp } from "firebase/firestore";
 import type { AIInsightReport } from "./pages/insights/types.ts";
 import type { WardrobeAnalysis } from "./ai/analyze-wardrobe.ts";
+import type { GeneratedOutfit } from "./ai/generate-outfits.ts";
 
 function itemsCol() {
   const uid = auth.currentUser?.uid;
@@ -212,6 +213,40 @@ export async function getLatestInsightReport(): Promise<AIInsightReport | null> 
   if (snap.empty) return null;
   const d = snap.docs[0];
   return { id: d.id, ...d.data() } as AIInsightReport;
+}
+
+/* ── Saved outfits ─────────────────────────────────────── */
+
+export type SavedOutfit = GeneratedOutfit & { id: string; createdAt: Timestamp };
+
+function outfitsCol() {
+  const uid = auth.currentUser?.uid;
+  if (!uid) throw new Error("Not authenticated");
+  return collection(db, "users", uid, "outfits");
+}
+
+export async function saveOutfit(outfit: GeneratedOutfit): Promise<string> {
+  const col = outfitsCol();
+  const newRef = doc(col);
+  await setDoc(newRef, { ...outfit, createdAt: serverTimestamp() });
+  return newRef.id;
+}
+
+export async function deleteOutfit(outfitId: string): Promise<void> {
+  await deleteDoc(doc(outfitsCol(), outfitId));
+}
+
+export function subscribeOutfits(
+  cb: (outfits: SavedOutfit[]) => void,
+): () => void {
+  const q = query(outfitsCol(), orderBy("createdAt", "desc"));
+  return onSnapshot(q, (snap) => {
+    const outfits: SavedOutfit[] = snap.docs.map((d) => ({
+      id: d.id,
+      ...(d.data() as Omit<SavedOutfit, "id">),
+    }));
+    cb(outfits);
+  });
 }
 
 export async function exportToJSON(): Promise<void> {

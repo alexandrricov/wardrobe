@@ -11,7 +11,9 @@ export type IconName =
   | "chevron-down"
   | "chevron-up"
   | "close"
-  | "plus";
+  | "plus"
+  | "tshirt"
+  | "tshirt-fill";
 
 type IconProps = React.SVGProps<SVGSVGElement> & {
   name: IconName;

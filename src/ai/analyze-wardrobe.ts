@@ -1,5 +1,6 @@
 import type { ComputedInsights, StyleTwin } from "../pages/insights/types.ts";
 import type { UserProfile } from "../firebase-db.ts";
+import { callWithFallback } from "./call-model.ts";
 
 export type WardrobeAnalysis = {
   itemCount: number;
@@ -101,12 +102,6 @@ Respond with ONLY valid JSON, no markdown fences:
 }`;
 }
 
-const MODELS = [
-  "deepseek/deepseek-chat-v3.1",
-  "google/gemini-2.0-flash-001",
-  "meta-llama/llama-3.3-70b-instruct",
-];
-
 type AIRawResponse = {
   styleProfile: string;
   gaps: string[];
@@ -118,70 +113,23 @@ type AIRawResponse = {
   styleTwins: { name: string; why: string }[];
 };
 
-async function callModel(
-  model: string,
-  prompt: string,
-  apiKey: string,
-): Promise<AIRawResponse> {
-  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 1500,
-    }),
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`${res.status}:${text}`);
-  }
-
-  const data = await res.json();
-  const raw = data.choices?.[0]?.message?.content;
-  if (!raw) throw new Error("Empty response from AI");
-
-  const cleaned = raw.replace(/```json?\n?/g, "").replace(/```/g, "").trim();
-  return JSON.parse(cleaned) as AIRawResponse;
-}
-
 export async function analyzeWardrobe(
   stats: ComputedInsights,
   apiKey: string,
   profile: UserProfile,
 ): Promise<WardrobeAnalysis> {
   const prompt = buildPrompt(stats, profile);
+  const result = await callWithFallback<AIRawResponse>(prompt, apiKey, 1500);
 
-  for (const model of MODELS) {
-    try {
-      const result = await callModel(model, prompt, apiKey);
-      return {
-        itemCount: stats.totalItems,
-        styleProfile: result.styleProfile ?? "",
-        gaps: Array.isArray(result.gaps) ? result.gaps : [],
-        versatility: result.versatility ?? "",
-        colorAnalysis: result.colorAnalysis ?? "",
-        seasonReadiness: result.seasonReadiness ?? {},
-        recommendations: Array.isArray(result.recommendations) ? result.recommendations : [],
-        fashionTips: Array.isArray(result.fashionTips) ? result.fashionTips : [],
-        styleTwins: Array.isArray(result.styleTwins) ? result.styleTwins : [],
-      };
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "";
-      const retryable = /^(429|404|502|503):/.test(msg);
-      if (retryable && model !== MODELS[MODELS.length - 1]) {
-        continue;
-      }
-      if (retryable) {
-        throw new Error("All models unavailable. Try again in a minute.");
-      }
-      throw err;
-    }
-  }
-
-  throw new Error("No models available");
+  return {
+    itemCount: stats.totalItems,
+    styleProfile: result.styleProfile ?? "",
+    gaps: Array.isArray(result.gaps) ? result.gaps : [],
+    versatility: result.versatility ?? "",
+    colorAnalysis: result.colorAnalysis ?? "",
+    seasonReadiness: result.seasonReadiness ?? {},
+    recommendations: Array.isArray(result.recommendations) ? result.recommendations : [],
+    fashionTips: Array.isArray(result.fashionTips) ? result.fashionTips : [],
+    styleTwins: Array.isArray(result.styleTwins) ? result.styleTwins : [],
+  };
 }

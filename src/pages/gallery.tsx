@@ -5,6 +5,7 @@ import type { CategoryType } from "../categories.ts";
 import type { ClosetItemDB } from "../types.ts";
 import { ItemCard } from "../components/item-card.tsx";
 import { Select } from "../components/select.tsx";
+import { NavLink } from "../components/action.tsx";
 
 export function Gallery() {
   const [items, setItems] = useState<ClosetItemDB[]>([]);
@@ -45,6 +46,9 @@ export function Gallery() {
       <div className="flex items-center gap-3 mb-4">
         <h1 className="text-h2">ClosetBook</h1>
         <span className="text-muted text-sm">{filtered.length} items</span>
+        <NavLink to="/add" variation="primary" size="small" className="ml-auto" icon={{ name: "plus", position: "left" }}>
+          Add
+        </NavLink>
       </div>
 
       <input

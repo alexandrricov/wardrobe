@@ -40,12 +40,14 @@ export function Header() {
             </li>
             <li>
               <NavLink
-                to="/add"
+                to="/outfits"
                 className={({ isActive }) => (isActive ? "text-on-accent" : "")}
               >
-                <>
-                  <Icon name="plus" /> Add
-                </>
+                {({ isActive }) => (
+                  <>
+                    <Icon name={isActive ? "tshirt-fill" : "tshirt"} /> Outfits
+                  </>
+                )}
               </NavLink>
             </li>
             <li>

@@ -9,6 +9,7 @@ import { ItemDetail } from "./pages/item-detail.tsx";
 import { AddItem } from "./pages/add-item.tsx";
 import { Settings } from "./pages/settings.tsx";
 import { Insights } from "./pages/insights/index.tsx";
+import { Outfits } from "./pages/outfits/index.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -19,6 +20,7 @@ createRoot(document.getElementById("root")!).render(
             <Route index element={<Gallery />} />
             <Route path="item/:id" element={<ItemDetail />} />
             <Route path="add" element={<AddItem />} />
+            <Route path="outfits" element={<Outfits />} />
             <Route path="insights" element={<Insights />} />
             <Route path="settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/" />} />
