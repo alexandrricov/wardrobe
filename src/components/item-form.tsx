@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CATEGORIES, CATEGORY_ORDER, SEASONS, categoryLabel, categoryOf } from "../categories.ts";
+import { CATEGORIES, CATEGORY_ORDER, SEASONS, categoryLabel, categoryOf, type CategoryType } from "../categories.ts";
 import type { WardrobeItem } from "../types.ts";
 import { PhotoUpload } from "./photo-upload.tsx";
 import { analyzePhoto } from "../ai/analyze-photo.ts";
