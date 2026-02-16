@@ -8,9 +8,12 @@ import {
   clearAllItems,
   saveAiApiKey,
   getAiApiKey,
+  saveUserProfile,
+  getUserProfile,
 } from "../firebase-db.ts";
 import { Button } from "../components/action.tsx";
 import { Input } from "../components/input.tsx";
+import { Select } from "../components/select.tsx";
 
 export function Settings() {
   const { user } = useAuth();
@@ -18,12 +21,22 @@ export function Settings() {
   const [importing, setImporting] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [gender, setGender] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [styleGoal, setStyleGoal] = useState("");
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const [apiKey, setApiKey] = useState("");
   const [apiKeyLoaded, setApiKeyLoaded] = useState(false);
   const [apiKeySaving, setApiKeySaving] = useState(false);
   const [apiKeyMsg, setApiKeyMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    getUserProfile().then((p) => {
+      if (p.gender) setGender(p.gender);
+      if (p.birthDate) setBirthDate(p.birthDate);
+      if (p.styleGoal) setStyleGoal(p.styleGoal);
+      setProfileLoaded(true);
+    });
     getAiApiKey().then((key) => {
       if (key) setApiKey(key);
       setApiKeyLoaded(true);
@@ -75,6 +88,61 @@ export function Settings() {
           Sign out
         </button>
       </div>
+
+      {/* Profile */}
+      {profileLoaded && (
+        <div className="section">
+          <h2 className="text-h3 mb-3">Profile</h2>
+          <p className="text-sm text-muted mb-3">
+            Used for personalized AI recommendations.
+          </p>
+          <div className="flex gap-3">
+            <Select
+              value={gender}
+              onChange={(e) => {
+                const v = e.target.value;
+                setGender(v);
+                saveUserProfile({ gender: v || null, birthDate: birthDate || null, styleGoal: styleGoal || null });
+              }}
+              options={[
+                { value: "", children: "Not set" },
+                { value: "male", children: "Male" },
+                { value: "female", children: "Female" },
+                { value: "other", children: "Other" },
+              ]}
+              className="flex-1"
+              aria-label="Gender"
+            >
+              Gender
+            </Select>
+            <Input
+              type="date"
+              value={birthDate}
+              onChange={(e) => {
+                const v = e.target.value;
+                setBirthDate(v);
+                saveUserProfile({ gender: gender || null, birthDate: v || null, styleGoal: styleGoal || null });
+              }}
+              className="flex-1"
+            >
+              Date of birth
+            </Input>
+          </div>
+          <label className="block mt-3">
+            <span className="text-xs text-muted">Desired style</span>
+            <textarea
+              value={styleGoal}
+              onChange={(e) => setStyleGoal(e.target.value)}
+              onBlur={() => {
+                saveUserProfile({ gender: gender || null, birthDate: birthDate || null, styleGoal: styleGoal.trim() || null });
+              }}
+              placeholder="e.g. Minimalist smart casual for work, streetwear on weekends"
+              rows={2}
+              className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-border bg-transparent resize-none"
+            />
+          </label>
+        </div>
+      )}
 
       {/* AI */}
       <div className="section">

@@ -11,11 +11,14 @@ import {
   writeBatch,
   query,
   orderBy,
+  limit,
 } from "firebase/firestore";
 import { auth, db } from "./firebase.ts";
 import { imageStorage } from "./storage/index.ts";
 import type { ClosetItem, ClosetItemDB } from "./types.ts";
 import type { Timestamp } from "firebase/firestore";
+import type { AIInsightReport } from "./pages/insights/types.ts";
+import type { WardrobeAnalysis } from "./ai/analyze-wardrobe.ts";
 
 function itemsCol() {
   const uid = auth.currentUser?.uid;
@@ -162,6 +165,53 @@ export async function getAiApiKey(): Promise<string | null> {
   if (!uid) throw new Error("Not authenticated");
   const snap = await getDoc(doc(db, "users", uid));
   return (snap.data()?.aiApiKey as string) ?? null;
+}
+
+/* ── User profile ──────────────────────────────────────── */
+
+export type UserProfile = { gender: string | null; birthDate: string | null; styleGoal: string | null };
+
+export async function saveUserProfile(profile: UserProfile): Promise<void> {
+  const uid = auth.currentUser?.uid;
+  if (!uid) throw new Error("Not authenticated");
+  await updateDoc(doc(db, "users", uid), { ...profile });
+}
+
+export async function getUserProfile(): Promise<UserProfile> {
+  const uid = auth.currentUser?.uid;
+  if (!uid) throw new Error("Not authenticated");
+  const snap = await getDoc(doc(db, "users", uid));
+  const data = snap.data();
+  return {
+    gender: (data?.gender as string) ?? null,
+    birthDate: (data?.birthDate as string) ?? null,
+    styleGoal: (data?.styleGoal as string) ?? null,
+  };
+}
+
+/* ── Insight reports ────────────────────────────────────── */
+
+function insightsCol() {
+  const uid = auth.currentUser?.uid;
+  if (!uid) throw new Error("Not authenticated");
+  return collection(db, "users", uid, "insights");
+}
+
+export async function saveInsightReport(
+  data: WardrobeAnalysis,
+): Promise<string> {
+  const col = insightsCol();
+  const newRef = doc(col);
+  await setDoc(newRef, { ...data, createdAt: serverTimestamp() });
+  return newRef.id;
+}
+
+export async function getLatestInsightReport(): Promise<AIInsightReport | null> {
+  const q = query(insightsCol(), orderBy("createdAt", "desc"), limit(1));
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  const d = snap.docs[0];
+  return { id: d.id, ...d.data() } as AIInsightReport;
 }
 
 export async function exportToJSON(): Promise<void> {
