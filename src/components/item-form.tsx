@@ -4,6 +4,7 @@ import type { ClosetItem } from "../types.ts";
 import { PhotoUpload } from "./photo-upload.tsx";
 import { analyzePhoto } from "../ai/analyze-photo.ts";
 import { getAiApiKey } from "../firebase-db.ts";
+import { Button } from "./action.tsx";
 import clsx from "clsx";
 
 type Props = {
@@ -117,14 +118,15 @@ export function ItemForm({
 
       {photoSource && (
         <div>
-          <button
+          <Button
             type="button"
+            variation="secondary"
+            size="medium"
             disabled={analyzing}
             onClick={handleAnalyze}
-            className="px-4 py-2 rounded-lg border border-brand text-brand text-sm font-medium hover:bg-brand/5 disabled:opacity-50 transition-colors"
           >
             {analyzing ? "Analyzing..." : "Analyze with AI"}
-          </button>
+          </Button>
           {aiError && (
             <p className="mt-1 text-xs text-red-600" role="alert">
               {aiError}
@@ -257,19 +259,20 @@ export function ItemForm({
       </div>
 
       <div className="flex gap-3 pt-2">
-        <button
+        <Button
           type="submit"
+          variation="primary"
+          size="medium"
           disabled={saving}
-          className="px-5 py-2 rounded-lg bg-brand text-on-accent font-medium text-sm hover:bg-brand-dark disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : submitLabel}
-        </button>
+        </Button>
 
         {onDelete && (
           <button
             type="button"
             disabled={saving}
-            className="px-5 py-2 rounded-lg border border-red-300 text-red-600 text-sm hover:bg-red-50 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 rounded-lg border border-red-300 text-red-600 text-sm font-medium hover:bg-red-50 disabled:opacity-50 transition-colors cursor-pointer"
             onClick={async () => {
               if (confirm("Delete this item?")) {
                 setSaving(true);

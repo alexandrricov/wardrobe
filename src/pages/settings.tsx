@@ -9,6 +9,8 @@ import {
   saveAiApiKey,
   getAiApiKey,
 } from "../firebase-db.ts";
+import { Button } from "../components/action.tsx";
+import { Input } from "../components/input.tsx";
 
 export function Settings() {
   const { user } = useAuth();
@@ -68,7 +70,7 @@ export function Settings() {
         </div>
         <button
           onClick={() => signOut(auth)}
-          className="text-sm text-red-600 hover:underline"
+          className="text-sm text-red-600 hover:underline cursor-pointer"
         >
           Sign out
         </button>
@@ -103,23 +105,25 @@ export function Settings() {
                 setApiKeySaving(false);
               }
             }}
-            className="flex gap-2"
+            className="flex gap-2 items-end"
           >
-            <input
+            <Input
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="sk-or-..."
-              className="flex-1 section px-3 py-2 text-sm"
-              aria-label="OpenRouter API key"
-            />
-            <button
+              className="flex-1"
+            >
+              API Key
+            </Input>
+            <Button
               type="submit"
+              variation="primary"
+              size="medium"
               disabled={apiKeySaving}
-              className="px-4 py-2 rounded-lg bg-brand text-on-accent font-medium text-sm hover:bg-brand-dark disabled:opacity-50 transition-colors"
             >
               {apiKeySaving ? "Saving..." : "Save"}
-            </button>
+            </Button>
           </form>
         )}
         {apiKeyMsg && (
@@ -144,13 +148,14 @@ export function Settings() {
           className="hidden"
         />
         <div className="flex gap-3">
-          <button
+          <Button
+            variation="primary"
+            size="medium"
             onClick={() => fileRef.current?.click()}
             disabled={importing || clearing}
-            className="px-4 py-2 rounded-lg bg-brand text-on-accent font-medium text-sm hover:bg-brand-dark disabled:opacity-50 transition-colors"
           >
             {importing ? "Importing..." : "Import JSON"}
-          </button>
+          </Button>
           <button
             onClick={async () => {
               if (!confirm("Delete ALL items? This cannot be undone.")) return;
@@ -166,7 +171,7 @@ export function Settings() {
               }
             }}
             disabled={importing || clearing}
-            className="px-4 py-2 rounded-lg border border-red-300 text-red-600 text-sm font-medium hover:bg-red-50 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 rounded-lg border border-red-300 text-red-600 text-sm font-medium hover:bg-red-50 disabled:opacity-50 transition-colors cursor-pointer"
           >
             {clearing ? "Clearing..." : "Clear all"}
           </button>
@@ -187,12 +192,13 @@ export function Settings() {
         <p className="text-sm text-muted mb-3">
           Download all data as JSON.
         </p>
-        <button
+        <Button
+          variation="secondary"
+          size="medium"
           onClick={exportToJSON}
-          className="px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-canvas2 transition-colors"
         >
           Export Data
-        </button>
+        </Button>
       </div>
     </div>
   );

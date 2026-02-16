@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import clsx from "clsx";
+import { Icon } from "./icon.tsx";
 
 type Props = {
   currentUrl?: string | null;
@@ -67,14 +68,14 @@ export function PhotoUpload({ currentUrl, onSelect }: Props) {
       {shown && (
         <button
           type="button"
-          className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center hover:bg-black/80"
+          className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-black/80"
           onClick={(e) => {
             e.stopPropagation();
             handleFile(null);
           }}
           aria-label="Remove photo"
         >
-          &times;
+          <Icon name="close" size={16} />
         </button>
       )}
     </div>

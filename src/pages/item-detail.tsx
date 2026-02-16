@@ -6,6 +6,7 @@ import { updateItem, deleteItem } from "../firebase-db.ts";
 import { categoryLabel } from "../categories.ts";
 import type { ClosetItem, ClosetItemDB } from "../types.ts";
 import { ItemForm } from "../components/item-form.tsx";
+import { Button } from "../components/action.tsx";
 
 export function ItemDetail() {
   const { id } = useParams<{ id: string }>();
@@ -110,13 +111,14 @@ export function ItemDetail() {
             )}
           </dl>
 
-          <button
-            type="button"
+          <Button
+            variation="primary"
+            size="medium"
             onClick={() => setEditing(true)}
-            className="mt-6 px-5 py-2 rounded-lg bg-brand text-on-accent font-medium text-sm hover:bg-brand-dark transition-colors"
+            className="mt-6"
           >
             Edit
-          </button>
+          </Button>
         </div>
       </div>
     </div>

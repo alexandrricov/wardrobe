@@ -4,7 +4,7 @@ import { CATEGORY_ORDER, SEASONS, categoryLabel } from "../categories.ts";
 import type { CategoryType } from "../categories.ts";
 import type { ClosetItemDB } from "../types.ts";
 import { ItemCard } from "../components/item-card.tsx";
-import clsx from "clsx";
+import { Select } from "../components/select.tsx";
 
 export function Gallery() {
   const [items, setItems] = useState<ClosetItemDB[]>([]);
@@ -43,7 +43,7 @@ export function Gallery() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-4">
-        <h1 className="text-h2">Closet Book</h1>
+        <h1 className="text-h2">ClosetBook</h1>
         <span className="text-muted text-sm">{filtered.length} items</span>
       </div>
 
@@ -55,32 +55,33 @@ export function Gallery() {
         className="w-full section px-3 py-2 text-sm mb-4"
       />
 
-      {/* Category pills */}
-      <div className="flex flex-wrap gap-1.5 mb-3">
-        <Pill active={category === "all"} onClick={() => setCategory("all")}>
-          All
-        </Pill>
-        {CATEGORY_ORDER.map((cat) => (
-          <Pill
-            key={cat}
-            active={category === cat}
-            onClick={() => setCategory(cat)}
-          >
-            {categoryLabel(cat)}
-          </Pill>
-        ))}
-      </div>
+      <div className="flex gap-3 mb-6">
+        <Select
+          value={category}
+          onChange={(e) => setCategory(e.target.value as CategoryType | "all")}
+          options={[
+            { value: "all", children: "All categories" },
+            ...CATEGORY_ORDER.map((cat) => ({
+              value: cat,
+              children: categoryLabel(cat),
+            })),
+          ]}
+          className="flex-1"
+        >
+          Category
+        </Select>
 
-      {/* Season pills */}
-      <div className="flex flex-wrap gap-1.5 mb-6">
-        <Pill active={season === "all"} onClick={() => setSeason("all")}>
-          All seasons
-        </Pill>
-        {SEASONS.map((s) => (
-          <Pill key={s} active={season === s} onClick={() => setSeason(s)}>
-            {s}
-          </Pill>
-        ))}
+        <Select
+          value={season}
+          onChange={(e) => setSeason(e.target.value)}
+          options={[
+            { value: "all", children: "All seasons" },
+            ...SEASONS.map((s) => ({ value: s, children: s })),
+          ]}
+          className="flex-1"
+        >
+          Season
+        </Select>
       </div>
 
       {/* Items grid by category */}
@@ -101,30 +102,5 @@ export function Gallery() {
         <p className="text-center text-muted py-16">No items match filters</p>
       )}
     </div>
-  );
-}
-
-function Pill({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={clsx(
-        "px-3 py-1 rounded-full text-xs font-medium border transition-colors",
-        active
-          ? "bg-brand text-on-accent border-brand"
-          : "bg-transparent text-muted border-border hover:border-muted",
-      )}
-    >
-      {children}
-    </button>
   );
 }

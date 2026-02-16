@@ -1,37 +1,68 @@
 import { NavLink } from "react-router";
-import clsx from "clsx";
-
-const NAV = [
-  { to: "/", label: "Gallery", end: true },
-  { to: "/add", label: "Add" },
-  { to: "/settings", label: "Settings" },
-] as const;
+import { Icon } from "./components/icon";
+import { clsx } from "clsx";
 
 export function Header() {
   return (
     <header
-      className="border-t sm:border-t-0 sm:border-b border-border bg-canvas2 px-4"
+      className={clsx(
+        "max-sm:border-t sm:border-b border-border w-full bg-canvas z-10",
+      )}
       style={{ gridArea: "header" }}
     >
-      <nav className="flex justify-center gap-1 sm:gap-2 max-w-4xl mx-auto">
-        {NAV.map(({ to, label, ...rest }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={"end" in rest}
-            className={({ isActive }) =>
-              clsx(
-                "px-4 py-3 text-sm font-medium transition-colors",
-                isActive
-                  ? "text-brand border-b-2 border-brand sm:border-b-2"
-                  : "text-muted hover:text-canvas-text",
-              )
-            }
-          >
-            {label}
-          </NavLink>
-        ))}
-      </nav>
+      <div
+        className={clsx(
+          "flex items-center justify-between p-4 max-w-150 mx-auto",
+          "max-sm:pt-2 max-sm:pb-[max(8px,env(safe-area-inset-bottom))] max-sm:pl-[max(16px,env(safe-area-inset-left))] max-sm:pr-[max(16px,env(safe-area-inset-right))]",
+        )}
+      >
+        <nav
+          className={clsx(
+            "flex justify-center items-stretch w-full",
+            "[&_:is(a,button)]:flex [&_:is(a,button)]:p-2 [&_:is(a,button)]:items-center [&_:is(a,button)]:justify-center [&_:is(a,button)]:text-sm [&_:is(a,button)]:transition-colors",
+            "sm:[&_:is(a,button)]:gap-1",
+            "max-sm:[&_:is(a,button)]:h-full max-sm:[&_:is(a,button)]:flex-col max-sm:[&_:is(a,button)]:min-w-15",
+          )}
+        >
+          <ul className={clsx("max-w-150 w-fit fancy-nav")}>
+            <li>
+              <NavLink
+                to="/"
+                end
+                className={({ isActive }) => (isActive ? "text-on-accent" : "")}
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon name={isActive ? "house-fill" : "house"} /> Gallery
+                  </>
+                )}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/add"
+                className={({ isActive }) => (isActive ? "text-on-accent" : "")}
+              >
+                <>
+                  <Icon name="plus" /> Add
+                </>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/settings"
+                className={({ isActive }) => (isActive ? "text-on-accent" : "")}
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon name={isActive ? "gear-fill" : "gear"} /> Settings
+                  </>
+                )}
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </header>
   );
 }

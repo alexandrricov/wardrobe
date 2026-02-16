@@ -16,14 +16,14 @@ export default defineConfig(({ mode }) => {
         registerType: "autoUpdate",
         injectRegister: "auto",
         manifest: {
-          name: "Closet Book",
-          short_name: "Closet Book",
+          name: "ClosetBook",
+          short_name: "ClosetBook",
           description: "Personal closet catalog with photos and details.",
           start_url: base,
           scope: base,
           display: "standalone",
-          background_color: "#f5f3ef",
-          theme_color: "#6b7f5e",
+          background_color: "#f0f2f7",
+          theme_color: "#b04a75",
           icons: [
             { src: "icons/pwa-192.png", sizes: "192x192", type: "image/png" },
             { src: "icons/pwa-512.png", sizes: "512x512", type: "image/png" },
