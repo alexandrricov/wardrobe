@@ -2,12 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { subscribeItems } from "../firebase-db.ts";
 import { CATEGORY_ORDER, SEASONS, categoryLabel } from "../categories.ts";
 import type { CategoryType } from "../categories.ts";
-import type { WardrobeItemDB } from "../types.ts";
+import type { ClosetItemDB } from "../types.ts";
 import { ItemCard } from "../components/item-card.tsx";
 import clsx from "clsx";
 
 export function Gallery() {
-  const [items, setItems] = useState<WardrobeItemDB[]>([]);
+  const [items, setItems] = useState<ClosetItemDB[]>([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<CategoryType | "all">("all");
   const [season, setSeason] = useState<string>("all");
@@ -31,7 +31,7 @@ export function Gallery() {
   }, [items, search, category, season]);
 
   const grouped = useMemo(() => {
-    const map = new Map<string, WardrobeItemDB[]>();
+    const map = new Map<string, ClosetItemDB[]>();
     for (const item of filtered) {
       const list = map.get(item.category) ?? [];
       list.push(item);
@@ -43,7 +43,7 @@ export function Gallery() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-4">
-        <h1 className="text-h2">Wardrobe</h1>
+        <h1 className="text-h2">Closet Book</h1>
         <span className="text-muted text-sm">{filtered.length} items</span>
       </div>
 

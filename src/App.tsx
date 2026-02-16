@@ -41,8 +41,8 @@ export default function App() {
         <div className="text-center pt-20 text-muted">Loading...</div>
       ) : (
         <div className="text-center h-full flex flex-col justify-center items-center px-4">
-          <h1 className="text-h1 mb-2">Wardrobe</h1>
-          <p className="text-muted mb-8">Personal wardrobe catalog</p>
+          <h1 className="text-h1 mb-2">Closet Book</h1>
+          <p className="text-muted mb-8">Personal closet catalog</p>
           <button
             onClick={login}
             className="px-6 py-2.5 rounded-lg bg-brand text-on-accent font-medium text-sm hover:bg-brand-dark transition-colors"

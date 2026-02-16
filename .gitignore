@@ -4,6 +4,6 @@ dev-dist
 *.local
 .claude
 images/
-wardrobe.json
-wardrobe-cloudinary.json
+closet-book.json
+closet-book-cloudinary.json
 scripts/

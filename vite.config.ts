@@ -5,7 +5,7 @@ import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig(({ mode }) => {
   const isProd = mode === "production";
-  const base = isProd ? "/wardrobe/" : "/";
+  const base = isProd ? "/closet-book/" : "/";
 
   return {
     plugins: [
@@ -16,9 +16,9 @@ export default defineConfig(({ mode }) => {
         registerType: "autoUpdate",
         injectRegister: "auto",
         manifest: {
-          name: "Wardrobe",
-          short_name: "Wardrobe",
-          description: "Personal wardrobe catalog with photos and details.",
+          name: "Closet Book",
+          short_name: "Closet Book",
+          description: "Personal closet catalog with photos and details.",
           start_url: base,
           scope: base,
           display: "standalone",
@@ -49,7 +49,7 @@ export default defineConfig(({ mode }) => {
               },
             },
           ],
-          navigateFallback: isProd ? "/wardrobe/index.html" : "/index.html",
+          navigateFallback: isProd ? "/closet-book/index.html" : "/index.html",
         },
         devOptions: {
           enabled: false,
@@ -59,6 +59,6 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5178,
     },
-    base: isProd ? "/wardrobe/" : "/",
+    base: isProd ? "/closet-book/" : "/",
   };
 });

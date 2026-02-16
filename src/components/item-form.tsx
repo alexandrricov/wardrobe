@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { CATEGORIES, CATEGORY_ORDER, SEASONS, categoryLabel, categoryOf, type CategoryType } from "../categories.ts";
-import type { WardrobeItem } from "../types.ts";
+import type { ClosetItem } from "../types.ts";
 import { PhotoUpload } from "./photo-upload.tsx";
 import { analyzePhoto } from "../ai/analyze-photo.ts";
 import { getAiApiKey } from "../firebase-db.ts";
 import clsx from "clsx";
 
 type Props = {
-  defaultValues?: Partial<WardrobeItem> & { photo?: string | null };
-  onSubmit: (data: WardrobeItem, photoFile: File | null) => Promise<void>;
+  defaultValues?: Partial<ClosetItem> & { photo?: string | null };
+  onSubmit: (data: ClosetItem, photoFile: File | null) => Promise<void>;
   onDelete?: () => Promise<void>;
   submitLabel?: string;
 };
@@ -21,7 +21,7 @@ export function ItemForm({
 }: Props) {
   const [saving, setSaving] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [aiValues, setAiValues] = useState<Partial<WardrobeItem> | null>(null);
+  const [aiValues, setAiValues] = useState<Partial<ClosetItem> | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [formKey, setFormKey] = useState(0);
@@ -81,7 +81,7 @@ export function ItemForm({
     setSaving(true);
 
     const fd = new FormData(e.currentTarget);
-    const data: WardrobeItem = {
+    const data: ClosetItem = {
       item: (fd.get("item") as string).trim(),
       color: (fd.get("color") as string)
         .split(",")

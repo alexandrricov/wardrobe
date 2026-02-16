@@ -11,7 +11,7 @@ export const cloudinaryStorage: ImageStorage = {
     const fd = new FormData();
     fd.append("file", compressed);
     fd.append("upload_preset", UPLOAD_PRESET);
-    fd.append("folder", "wardrobe");
+    fd.append("folder", "closet-book");
 
     const res = await fetch(
       `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,

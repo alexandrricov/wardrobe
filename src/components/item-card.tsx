@@ -1,7 +1,7 @@
 import { Link } from "react-router";
-import type { WardrobeItemDB } from "../types.ts";
+import type { ClosetItemDB } from "../types.ts";
 
-export function ItemCard({ item }: { item: WardrobeItemDB }) {
+export function ItemCard({ item }: { item: ClosetItemDB }) {
   return (
     <Link
       to={`/item/${item.id}`}

@@ -14,7 +14,7 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "./firebase.ts";
 import { imageStorage } from "./storage/index.ts";
-import type { WardrobeItem, WardrobeItemDB } from "./types.ts";
+import type { ClosetItem, ClosetItemDB } from "./types.ts";
 import type { Timestamp } from "firebase/firestore";
 
 function itemsCol() {
@@ -24,7 +24,7 @@ function itemsCol() {
 }
 
 export async function createItem(
-  data: WardrobeItem,
+  data: ClosetItem,
   photoFile?: File | null,
 ): Promise<string> {
   const col = itemsCol();
@@ -47,7 +47,7 @@ export async function createItem(
 
 export async function updateItem(
   itemId: string,
-  data: Partial<WardrobeItem>,
+  data: Partial<ClosetItem>,
   newPhotoFile?: File | null,
 ): Promise<void> {
   const ref = doc(itemsCol(), itemId);
@@ -66,13 +66,13 @@ export async function deleteItem(itemId: string): Promise<void> {
 }
 
 export function subscribeItems(
-  cb: (items: WardrobeItemDB[]) => void,
+  cb: (items: ClosetItemDB[]) => void,
 ): () => void {
   const q = query(itemsCol(), orderBy("createdAt", "asc"));
   return onSnapshot(q, (snap) => {
-    const items: WardrobeItemDB[] = snap.docs.map((d) => ({
+    const items: ClosetItemDB[] = snap.docs.map((d) => ({
       id: d.id,
-      ...(d.data() as Omit<WardrobeItemDB, "id">),
+      ...(d.data() as Omit<ClosetItemDB, "id">),
     }));
     cb(items);
   });
@@ -101,7 +101,7 @@ export async function clearAllItems(): Promise<number> {
   return total;
 }
 
-export async function importFromWardrobeJSON(file: File): Promise<number> {
+export async function importFromJSON(file: File): Promise<number> {
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error("Not authenticated");
 
@@ -109,7 +109,7 @@ export async function importFromWardrobeJSON(file: File): Promise<number> {
   const raw = JSON.parse(text) as { items?: unknown[] };
 
   if (!Array.isArray(raw.items)) {
-    throw new Error("Invalid wardrobe.json: missing items array");
+    throw new Error("Invalid JSON: missing items array");
   }
 
   const col = collection(db, "users", uid, "items");
@@ -165,7 +165,7 @@ export async function getAiApiKey(): Promise<string | null> {
 }
 
 export async function exportToJSON(): Promise<void> {
-  const items: WardrobeItemDB[] = await new Promise((resolve) => {
+  const items: ClosetItemDB[] = await new Promise((resolve) => {
     const unsub = subscribeItems((data) => {
       unsub();
       resolve(data);
@@ -194,7 +194,7 @@ export async function exportToJSON(): Promise<void> {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `wardrobe-export-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `closet-book-export-${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }

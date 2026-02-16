@@ -4,13 +4,13 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase.ts";
 import { updateItem, deleteItem } from "../firebase-db.ts";
 import { categoryLabel } from "../categories.ts";
-import type { WardrobeItem, WardrobeItemDB } from "../types.ts";
+import type { ClosetItem, ClosetItemDB } from "../types.ts";
 import { ItemForm } from "../components/item-form.tsx";
 
 export function ItemDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [item, setItem] = useState<WardrobeItemDB | null>(null);
+  const [item, setItem] = useState<ClosetItemDB | null>(null);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +19,7 @@ export function ItemDetail() {
     if (!uid || !id) return;
     return onSnapshot(doc(db, "users", uid, "items", id), (snap) => {
       if (snap.exists()) {
-        setItem({ id: snap.id, ...snap.data() } as WardrobeItemDB);
+        setItem({ id: snap.id, ...snap.data() } as ClosetItemDB);
       } else {
         setItem(null);
       }
@@ -43,7 +43,7 @@ export function ItemDetail() {
         <ItemForm
           defaultValues={item}
           submitLabel="Save Changes"
-          onSubmit={async (data: WardrobeItem, photoFile) => {
+          onSubmit={async (data: ClosetItem, photoFile) => {
             await updateItem(item.id, data, photoFile);
             setEditing(false);
           }}

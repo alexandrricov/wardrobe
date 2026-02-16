@@ -3,7 +3,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase.ts";
 import { useAuth } from "../providers/auth.tsx";
 import {
-  importFromWardrobeJSON,
+  importFromJSON,
   exportToJSON,
   clearAllItems,
   saveAiApiKey,
@@ -35,7 +35,7 @@ export function Settings() {
     setImporting(true);
     setMessage(null);
     try {
-      const count = await importFromWardrobeJSON(file);
+      const count = await importFromJSON(file);
       setMessage(`Imported ${count} items successfully.`);
     } catch (err) {
       setMessage(`Import failed: ${err instanceof Error ? err.message : "Unknown error"}`);
@@ -133,7 +133,7 @@ export function Settings() {
       <div className="section">
         <h2 className="text-h3 mb-3">Import</h2>
         <p className="text-sm text-muted mb-3">
-          Import items from a wardrobe.json file. Photos will need to be
+          Import items from a JSON file. Photos will need to be
           uploaded separately via the Edit page.
         </p>
         <input
@@ -149,11 +149,11 @@ export function Settings() {
             disabled={importing || clearing}
             className="px-4 py-2 rounded-lg bg-brand text-on-accent font-medium text-sm hover:bg-brand-dark disabled:opacity-50 transition-colors"
           >
-            {importing ? "Importing..." : "Import wardrobe.json"}
+            {importing ? "Importing..." : "Import JSON"}
           </button>
           <button
             onClick={async () => {
-              if (!confirm("Delete ALL items from your wardrobe? This cannot be undone.")) return;
+              if (!confirm("Delete ALL items? This cannot be undone.")) return;
               setClearing(true);
               setMessage(null);
               try {
@@ -185,7 +185,7 @@ export function Settings() {
       <div className="section">
         <h2 className="text-h3 mb-3">Export</h2>
         <p className="text-sm text-muted mb-3">
-          Download all wardrobe data as JSON.
+          Download all data as JSON.
         </p>
         <button
           onClick={exportToJSON}

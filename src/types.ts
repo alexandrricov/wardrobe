@@ -1,7 +1,7 @@
 import type { Timestamp } from "firebase/firestore";
 import type { CategoryType } from "./categories.ts";
 
-export type WardrobeItem = {
+export type ClosetItem = {
   item: string;
   color: string[];
   brand: string | null;
@@ -15,7 +15,7 @@ export type WardrobeItem = {
   subcategory: string | null;
 };
 
-export type WardrobeItemDB = WardrobeItem & {
+export type ClosetItemDB = ClosetItem & {
   id: string;
   createdAt: Timestamp;
 };
