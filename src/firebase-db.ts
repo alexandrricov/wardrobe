@@ -232,6 +232,10 @@ export async function saveOutfit(outfit: GeneratedOutfit): Promise<string> {
   return newRef.id;
 }
 
+export async function updateOutfit(outfitId: string, data: Partial<GeneratedOutfit>): Promise<void> {
+  await setDoc(doc(outfitsCol(), outfitId), data, { merge: true });
+}
+
 export async function deleteOutfit(outfitId: string): Promise<void> {
   await deleteDoc(doc(outfitsCol(), outfitId));
 }

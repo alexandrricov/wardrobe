@@ -9,6 +9,7 @@ import {
   getAiApiKey,
   getUserProfile,
   saveOutfit,
+  updateOutfit,
   deleteOutfit,
   subscribeOutfits,
 } from "../../firebase-db.ts";
@@ -16,6 +17,9 @@ import type { UserProfile, SavedOutfit } from "../../firebase-db.ts";
 import type { ClosetItemDB } from "../../types.ts";
 import { generateOutfits } from "../../ai/generate-outfits.ts";
 import type { GeneratedOutfit, OutfitContext } from "../../ai/generate-outfits.ts";
+import type { SlotId } from "../../outfit-slots.ts";
+import { SlotGrid } from "./slot-grid.tsx";
+import { ItemPicker, type PickerTarget } from "./item-picker.tsx";
 
 /* ── Weather helpers ──────────────────────────────────── */
 
@@ -72,6 +76,12 @@ async function fetchWeather(): Promise<WeatherData> {
   };
 }
 
+/* ── Editable outfit state ────────────────────────────── */
+
+function emptyOutfit(): GeneratedOutfit {
+  return { slots: {}, extras: [], occasion: "", why: "" };
+}
+
 /* ── Main component ───────────────────────────────────── */
 
 export function Outfits() {
@@ -86,11 +96,25 @@ export function Outfits() {
   const [savingIdx, setSavingIdx] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Weather
   const [useWeather, setUseWeather] = useState(true);
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [day, setDay] = useState<"today" | "tomorrow">(getDefaultDay);
   const [season, setSeason] = useState(getCurrentSeason);
+
+  // Picker
+  const [pickerTarget, setPickerTarget] = useState<PickerTarget | null>(null);
+  const [pickerOutfitRef, setPickerOutfitRef] = useState<{ kind: "suggestion"; idx: number } | { kind: "saved"; id: string } | { kind: "new" } | null>(null);
+
+  // Manual creation
+  const [newOutfit, setNewOutfit] = useState<GeneratedOutfit | null>(null);
+
+  // Editing saved
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState<GeneratedOutfit | null>(null);
+
+  /* ── Data subscriptions ── */
 
   useEffect(() => {
     const unsub = subscribeItems((data) => {
@@ -118,27 +142,30 @@ export function Outfits() {
   useEffect(() => {
     let cancelled = false;
     fetchWeather()
-      .then((w) => {
-        if (!cancelled) setWeather(w);
-      })
-      .catch(() => {
-        if (!cancelled) setUseWeather(false);
-      })
-      .finally(() => {
-        if (!cancelled) setWeatherLoading(false);
-      });
+      .then((w) => { if (!cancelled) setWeather(w); })
+      .catch(() => { if (!cancelled) setUseWeather(false); })
+      .finally(() => { if (!cancelled) setWeatherLoading(false); });
     return () => { cancelled = true; };
   }, []);
 
+  /* ── Context ── */
+
   const buildContext = useCallback((): OutfitContext => {
     if (useWeather && weather) {
-      const w = day === "today"
+      const isToday = day === "today";
+      const temp = isToday
+        ? weather.today.temp
+        : Math.round((weather.tomorrow.tempMin + weather.tomorrow.tempMax) / 2);
+      const description = isToday ? weather.today.description : weather.tomorrow.description;
+      const label = isToday
         ? `${weather.today.temp}°C, ${weather.today.description} (outfit for today)`
         : `${weather.tomorrow.tempMin}–${weather.tomorrow.tempMax}°C, ${weather.tomorrow.description} (outfit for tomorrow)`;
-      return { weather: w };
+      return { weather: { temp, description, label } };
     }
     return { season };
   }, [useWeather, weather, day, season]);
+
+  /* ── Actions ── */
 
   const generate = useCallback(async () => {
     setGenerating(true);
@@ -165,6 +192,28 @@ export function Outfits() {
     }
   }, []);
 
+  const handleSaveNew = useCallback(async () => {
+    if (!newOutfit) return;
+    setSavingIdx(-1);
+    try {
+      await saveOutfit(newOutfit);
+      setNewOutfit(null);
+    } finally {
+      setSavingIdx(null);
+    }
+  }, [newOutfit]);
+
+  const handleSaveEdit = useCallback(async () => {
+    if (!editingId || !editDraft) return;
+    try {
+      await updateOutfit(editingId, editDraft);
+      setEditingId(null);
+      setEditDraft(null);
+    } catch {
+      // ignore
+    }
+  }, [editingId, editDraft]);
+
   const handleDelete = useCallback(async (id: string) => {
     setDeletingId(id);
     try {
@@ -173,6 +222,73 @@ export function Outfits() {
       setDeletingId(null);
     }
   }, []);
+
+  /* ── Picker handlers ── */
+
+  function openPicker(target: PickerTarget, ref: typeof pickerOutfitRef) {
+    setPickerTarget(target);
+    setPickerOutfitRef(ref);
+  }
+
+  function handlePickerSelect(itemId: string | null) {
+    if (!pickerTarget || !pickerOutfitRef) return;
+
+    const apply = (outfit: GeneratedOutfit): GeneratedOutfit => {
+      if (pickerTarget.kind === "slot") {
+        const newSlots = { ...outfit.slots };
+        if (itemId) {
+          newSlots[pickerTarget.slotId] = itemId;
+        } else {
+          delete newSlots[pickerTarget.slotId];
+        }
+        return { ...outfit, slots: newSlots };
+      }
+      // extra
+      const newExtras = [...outfit.extras];
+      if (pickerTarget.index === null) {
+        // adding new
+        if (itemId) newExtras.push(itemId);
+      } else if (itemId) {
+        newExtras[pickerTarget.index] = itemId;
+      } else {
+        newExtras.splice(pickerTarget.index, 1);
+      }
+      return { ...outfit, extras: newExtras };
+    };
+
+    if (pickerOutfitRef.kind === "suggestion") {
+      setSuggestions((prev) =>
+        prev.map((o, i) => (i === pickerOutfitRef.idx ? apply(o) : o)),
+      );
+    } else if (pickerOutfitRef.kind === "new") {
+      setNewOutfit((prev) => (prev ? apply(prev) : prev));
+    } else if (pickerOutfitRef.kind === "saved") {
+      setEditDraft((prev) => (prev ? apply(prev) : prev));
+    }
+
+    setPickerTarget(null);
+    setPickerOutfitRef(null);
+  }
+
+  function getPickerCurrentId(): string | null {
+    if (!pickerTarget || !pickerOutfitRef) return null;
+
+    const getOutfit = (): GeneratedOutfit | null => {
+      if (pickerOutfitRef.kind === "suggestion") return suggestions[pickerOutfitRef.idx] ?? null;
+      if (pickerOutfitRef.kind === "new") return newOutfit;
+      if (pickerOutfitRef.kind === "saved") return editDraft;
+      return null;
+    };
+
+    const outfit = getOutfit();
+    if (!outfit) return null;
+
+    if (pickerTarget.kind === "slot") return outfit.slots[pickerTarget.slotId] ?? null;
+    if (pickerTarget.index !== null) return outfit.extras[pickerTarget.index] ?? null;
+    return null;
+  }
+
+  /* ── Loading / empty states ── */
 
   if (loading) {
     return (
@@ -213,8 +329,17 @@ export function Outfits() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
-        <h1 className="text-h1">Outfits</h1>
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-3">
+        <h1 className="text-h1 mr-auto">Outfits</h1>
+        <Button
+          variation="secondary"
+          size="small"
+          onClick={() => setNewOutfit(emptyOutfit())}
+          disabled={!!newOutfit}
+        >
+          + New
+        </Button>
         <Button
           variation="primary"
           size="small"
@@ -229,7 +354,7 @@ export function Outfits() {
         </Button>
       </div>
 
-      {/* Context controls */}
+      {/* Weather controls */}
       {!weatherLoading && (
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <label className="flex items-center gap-1.5 cursor-pointer">
@@ -283,7 +408,40 @@ export function Outfits() {
         <p className="text-sm text-red-500 mb-3" role="alert">{error}</p>
       )}
 
-      {/* Suggestions from AI */}
+      {/* Manual creation */}
+      {newOutfit && (
+        <section className="mb-6">
+          <h2 className="text-h3 mb-3">New outfit</h2>
+          <OutfitEditor
+            outfit={newOutfit}
+            itemMap={itemMap}
+            onSlotTap={(slotId) => openPicker({ kind: "slot", slotId }, { kind: "new" })}
+            onExtraTap={(i) => openPicker({ kind: "extra", index: i }, { kind: "new" })}
+            onAddExtra={() => openPicker({ kind: "extra", index: null }, { kind: "new" })}
+            occasionValue={newOutfit.occasion}
+            onOccasionChange={(v) => setNewOutfit({ ...newOutfit, occasion: v })}
+            actions={
+              <>
+                <button
+                  onClick={handleSaveNew}
+                  disabled={savingIdx === -1 || Object.keys(newOutfit.slots).length === 0}
+                  className="text-xs text-brand font-medium hover:underline cursor-pointer disabled:opacity-50"
+                >
+                  {savingIdx === -1 ? "Saving..." : "Save"}
+                </button>
+                <button
+                  onClick={() => setNewOutfit(null)}
+                  className="text-xs text-muted font-medium hover:underline cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </>
+            }
+          />
+        </section>
+      )}
+
+      {/* AI suggestions */}
       {generating && suggestions.length === 0 && (
         <div className="flex items-center justify-center py-16">
           <Icon name="loading" className="animate-spin text-muted" />
@@ -293,21 +451,32 @@ export function Outfits() {
       {suggestions.length > 0 && (
         <section className="mb-6">
           <h2 className="text-h3 mb-3">Suggestions</h2>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {suggestions.map((outfit, i) => (
-              <OutfitCard
+              <OutfitEditor
                 key={i}
                 outfit={outfit}
                 itemMap={itemMap}
-                action={
-                  <button
-                    onClick={() => handleSave(outfit, i)}
-                    disabled={savingIdx === i}
-                    className="text-xs text-brand font-medium hover:underline cursor-pointer disabled:opacity-50"
-                    aria-label="Save outfit"
-                  >
-                    {savingIdx === i ? "Saving..." : "Save"}
-                  </button>
+                onSlotTap={(slotId) => openPicker({ kind: "slot", slotId }, { kind: "suggestion", idx: i })}
+                onExtraTap={(idx) => openPicker({ kind: "extra", index: idx }, { kind: "suggestion", idx: i })}
+                onAddExtra={() => openPicker({ kind: "extra", index: null }, { kind: "suggestion", idx: i })}
+                subtitle={outfit.why}
+                actions={
+                  <>
+                    <button
+                      onClick={() => handleSave(outfit, i)}
+                      disabled={savingIdx === i}
+                      className="text-xs text-brand font-medium hover:underline cursor-pointer disabled:opacity-50"
+                    >
+                      {savingIdx === i ? "Saving..." : "Save"}
+                    </button>
+                    <button
+                      onClick={() => setSuggestions((prev) => prev.filter((_, j) => j !== i))}
+                      className="text-xs text-muted font-medium hover:underline cursor-pointer"
+                    >
+                      Dismiss
+                    </button>
+                  </>
                 }
               />
             ))}
@@ -319,86 +488,173 @@ export function Outfits() {
       {saved.length > 0 && (
         <section>
           <h2 className="text-h3 mb-3">Saved</h2>
-          <div className="space-y-3">
-            {saved.map((outfit) => (
-              <OutfitCard
-                key={outfit.id}
-                outfit={outfit}
-                itemMap={itemMap}
-                action={
-                  <button
-                    onClick={() => handleDelete(outfit.id)}
-                    disabled={deletingId === outfit.id}
-                    className="text-xs text-red-500 font-medium hover:underline cursor-pointer disabled:opacity-50"
-                    aria-label="Remove outfit"
-                  >
-                    {deletingId === outfit.id ? "Removing..." : "Remove"}
-                  </button>
-                }
-              />
-            ))}
+          <div className="space-y-4">
+            {saved.map((outfit) => {
+              const isEditing = editingId === outfit.id;
+              const display = isEditing && editDraft ? editDraft : outfit;
+
+              return isEditing ? (
+                <OutfitEditor
+                  key={outfit.id}
+                  outfit={display}
+                  itemMap={itemMap}
+                  onSlotTap={(slotId) => openPicker({ kind: "slot", slotId }, { kind: "saved", id: outfit.id })}
+                  onExtraTap={(idx) => openPicker({ kind: "extra", index: idx }, { kind: "saved", id: outfit.id })}
+                  onAddExtra={() => openPicker({ kind: "extra", index: null }, { kind: "saved", id: outfit.id })}
+                  occasionValue={display.occasion}
+                  onOccasionChange={(v) => setEditDraft(display ? { ...display, occasion: v } : null)}
+                  actions={
+                    <>
+                      <button
+                        onClick={handleSaveEdit}
+                        className="text-xs text-brand font-medium hover:underline cursor-pointer"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => { setEditingId(null); setEditDraft(null); }}
+                        className="text-xs text-muted font-medium hover:underline cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  }
+                />
+              ) : (
+                <OutfitCard
+                  key={outfit.id}
+                  outfit={outfit}
+                  itemMap={itemMap}
+                  actions={
+                    <>
+                      <button
+                        onClick={() => { setEditingId(outfit.id); setEditDraft({ slots: outfit.slots, extras: outfit.extras, occasion: outfit.occasion, why: outfit.why }); }}
+                        className="text-xs text-brand font-medium hover:underline cursor-pointer"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(outfit.id)}
+                        disabled={deletingId === outfit.id}
+                        className="text-xs text-red-500 font-medium hover:underline cursor-pointer disabled:opacity-50"
+                      >
+                        {deletingId === outfit.id ? "Removing..." : "Remove"}
+                      </button>
+                    </>
+                  }
+                />
+              );
+            })}
           </div>
         </section>
       )}
 
       {/* Empty state */}
-      {!generating && suggestions.length === 0 && saved.length === 0 && (
+      {!generating && suggestions.length === 0 && saved.length === 0 && !newOutfit && (
         <div className="py-16 text-center text-muted">
           <Icon name="tshirt" size={48} className="mx-auto mb-3 opacity-30" />
           <p className="text-sm">Generate outfit ideas from your wardrobe</p>
         </div>
       )}
+
+      {/* Item picker modal */}
+      {pickerTarget && (
+        <ItemPicker
+          target={pickerTarget}
+          items={items}
+          currentItemId={getPickerCurrentId()}
+          onSelect={handlePickerSelect}
+          onClose={() => { setPickerTarget(null); setPickerOutfitRef(null); }}
+        />
+      )}
     </div>
   );
 }
 
-/* ── Outfit card ──────────────────────────────────────── */
+/* ── Outfit editor (interactive slots) ────────────────── */
+
+function OutfitEditor({
+  outfit,
+  itemMap,
+  onSlotTap,
+  onExtraTap,
+  onAddExtra,
+  occasionValue,
+  onOccasionChange,
+  subtitle,
+  actions,
+}: {
+  outfit: GeneratedOutfit;
+  itemMap: Map<string, ClosetItemDB>;
+  onSlotTap: (slotId: SlotId) => void;
+  onExtraTap: (index: number) => void;
+  onAddExtra: () => void;
+  occasionValue?: string;
+  onOccasionChange?: (v: string) => void;
+  subtitle?: string;
+  actions: React.ReactNode;
+}) {
+  return (
+    <div className="section">
+      <div className="flex items-center gap-2 mb-3">
+        {onOccasionChange ? (
+          <input
+            type="text"
+            value={occasionValue ?? ""}
+            onChange={(e) => onOccasionChange(e.target.value)}
+            placeholder="Occasion..."
+            className="text-sm font-medium bg-transparent border-b border-border flex-1 py-0.5 outline-none focus:border-brand"
+          />
+        ) : (
+          <p className="text-sm font-medium flex-1">{outfit.occasion}</p>
+        )}
+        <div className="flex items-center gap-3 shrink-0">
+          {actions}
+        </div>
+      </div>
+      <SlotGrid
+        slots={outfit.slots}
+        extras={outfit.extras}
+        itemMap={itemMap}
+        onSlotTap={onSlotTap}
+        onExtraTap={onExtraTap}
+        onAddExtra={onAddExtra}
+      />
+      {subtitle && (
+        <p className="text-xs text-muted mt-2">{subtitle}</p>
+      )}
+    </div>
+  );
+}
+
+/* ── Outfit card (read-only view) ─────────────────────── */
 
 function OutfitCard({
   outfit,
   itemMap,
-  action,
+  actions,
 }: {
   outfit: GeneratedOutfit;
   itemMap: Map<string, ClosetItemDB>;
-  action: React.ReactNode;
+  actions: React.ReactNode;
 }) {
-  const outfitItems = outfit.itemIds
-    .map((id) => itemMap.get(id))
-    .filter((item): item is ClosetItemDB => !!item);
-
-  if (outfitItems.length === 0) return null;
-
   return (
     <div className="section">
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-sm font-medium">{outfit.occasion}</p>
-        {action}
+      <div className="flex items-center gap-2 mb-3">
+        <p className="text-sm font-medium flex-1">{outfit.occasion}</p>
+        <div className="flex items-center gap-3 shrink-0">
+          {actions}
+        </div>
       </div>
-      <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-        {outfitItems.map((item) => (
-          <Link
-            key={item.id}
-            to={`/item/${item.id}`}
-            className="shrink-0 w-24 no-underline"
-          >
-            {item.photo ? (
-              <img
-                src={item.photo}
-                alt={item.item}
-                loading="lazy"
-                className="w-24 h-24 object-contain rounded-lg bg-canvas2"
-              />
-            ) : (
-              <div className="w-24 h-24 rounded-lg bg-border/30 flex items-center justify-center text-muted text-xs">
-                no photo
-              </div>
-            )}
-            <p className="text-xs mt-1 truncate">{item.item}</p>
-          </Link>
-        ))}
-      </div>
-      <p className="text-xs text-muted mt-2">{outfit.why}</p>
+      <SlotGrid
+        slots={outfit.slots}
+        extras={outfit.extras}
+        itemMap={itemMap}
+        disabled
+      />
+      {outfit.why && (
+        <p className="text-xs text-muted mt-2">{outfit.why}</p>
+      )}
     </div>
   );
 }

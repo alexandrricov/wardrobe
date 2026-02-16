@@ -68,6 +68,17 @@ dialog::backdrop {
   backdrop-filter: blur(5px);
 }
 
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@layer utilities {
+  .animate-slide-up {
+    animation: slide-up 200ms ease-out;
+  }
+}
+
 @layer components {
   .section {
     @apply p-4 rounded-2xl border border-border mb-6;
