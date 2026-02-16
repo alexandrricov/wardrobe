@@ -451,34 +451,35 @@ export function Outfits() {
       {suggestions.length > 0 && (
         <section className="mb-6">
           <h2 className="text-h3 mb-3">Suggestions</h2>
-          <div className="space-y-4">
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory">
             {suggestions.map((outfit, i) => (
-              <OutfitEditor
-                key={i}
-                outfit={outfit}
-                itemMap={itemMap}
-                onSlotTap={(slotId) => openPicker({ kind: "slot", slotId }, { kind: "suggestion", idx: i })}
-                onExtraTap={(idx) => openPicker({ kind: "extra", index: idx }, { kind: "suggestion", idx: i })}
-                onAddExtra={() => openPicker({ kind: "extra", index: null }, { kind: "suggestion", idx: i })}
-                subtitle={outfit.why}
-                actions={
-                  <>
-                    <button
-                      onClick={() => handleSave(outfit, i)}
-                      disabled={savingIdx === i}
-                      className="text-xs text-brand font-medium hover:underline cursor-pointer disabled:opacity-50"
-                    >
-                      {savingIdx === i ? "Saving..." : "Save"}
-                    </button>
-                    <button
-                      onClick={() => setSuggestions((prev) => prev.filter((_, j) => j !== i))}
-                      className="text-xs text-muted font-medium hover:underline cursor-pointer"
-                    >
-                      Dismiss
-                    </button>
-                  </>
-                }
-              />
+              <div key={i} className="shrink-0 w-[85vw] max-w-80 snap-start">
+                <OutfitEditor
+                  outfit={outfit}
+                  itemMap={itemMap}
+                  onSlotTap={(slotId) => openPicker({ kind: "slot", slotId }, { kind: "suggestion", idx: i })}
+                  onExtraTap={(idx) => openPicker({ kind: "extra", index: idx }, { kind: "suggestion", idx: i })}
+                  onAddExtra={() => openPicker({ kind: "extra", index: null }, { kind: "suggestion", idx: i })}
+                  subtitle={outfit.why}
+                  actions={
+                    <>
+                      <button
+                        onClick={() => handleSave(outfit, i)}
+                        disabled={savingIdx === i}
+                        className="text-xs text-brand font-medium hover:underline cursor-pointer disabled:opacity-50"
+                      >
+                        {savingIdx === i ? "Saving..." : "Save"}
+                      </button>
+                      <button
+                        onClick={() => setSuggestions((prev) => prev.filter((_, j) => j !== i))}
+                        className="text-xs text-muted font-medium hover:underline cursor-pointer"
+                      >
+                        Dismiss
+                      </button>
+                    </>
+                  }
+                />
+              </div>
             ))}
           </div>
         </section>
