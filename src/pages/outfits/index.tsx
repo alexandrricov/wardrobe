@@ -9,6 +9,8 @@ import {
   getAiApiKey,
   getUserProfile,
   saveOutfit,
+  saveSuggestions,
+  promoteSuggestion,
   updateOutfit,
   deleteOutfit,
   subscribeOutfits,
@@ -87,13 +89,13 @@ function emptyOutfit(): GeneratedOutfit {
 export function Outfits() {
   const [items, setItems] = useState<ClosetItemDB[]>([]);
   const [loading, setLoading] = useState(true);
-  const [suggestions, setSuggestions] = useState<GeneratedOutfit[]>([]);
+  const [suggestions, setSuggestions] = useState<SavedOutfit[]>([]);
   const [saved, setSaved] = useState<SavedOutfit[]>([]);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasKey, setHasKey] = useState<boolean | null>(null);
   const [profile, setProfile] = useState<UserProfile>({ gender: null, birthDate: null, styleGoal: null });
-  const [savingIdx, setSavingIdx] = useState<number | null>(null);
+  const [savingId, setSavingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Weather
@@ -105,7 +107,7 @@ export function Outfits() {
 
   // Picker
   const [pickerTarget, setPickerTarget] = useState<PickerTarget | null>(null);
-  const [pickerOutfitRef, setPickerOutfitRef] = useState<{ kind: "suggestion"; idx: number } | { kind: "saved"; id: string } | { kind: "new" } | null>(null);
+  const [pickerOutfitRef, setPickerOutfitRef] = useState<{ kind: "suggestion"; id: string } | { kind: "saved"; id: string } | { kind: "new" } | null>(null);
 
   // Manual creation
   const [newOutfit, setNewOutfit] = useState<GeneratedOutfit | null>(null);
@@ -125,7 +127,10 @@ export function Outfits() {
   }, []);
 
   useEffect(() => {
-    const unsub = subscribeOutfits(setSaved);
+    const unsub = subscribeOutfits(({ suggestions: s, saved: sv }) => {
+      setSuggestions(s);
+      setSaved(sv);
+    });
     return unsub;
   }, []);
 
@@ -174,7 +179,7 @@ export function Outfits() {
       const key = await getAiApiKey();
       if (!key) throw new Error("No API key configured");
       const result = await generateOutfits(items, key, profile, buildContext());
-      setSuggestions(result);
+      await saveSuggestions(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Generation failed");
     } finally {
@@ -182,24 +187,24 @@ export function Outfits() {
     }
   }, [items, profile, buildContext]);
 
-  const handleSave = useCallback(async (outfit: GeneratedOutfit, idx: number) => {
-    setSavingIdx(idx);
+  const handleSave = useCallback(async (outfit: SavedOutfit) => {
+    setSavingId(outfit.id);
     try {
-      await saveOutfit(outfit);
-      setSuggestions((prev) => prev.filter((_, i) => i !== idx));
+      await updateOutfit(outfit.id, { slots: outfit.slots, extras: outfit.extras, occasion: outfit.occasion, why: outfit.why });
+      await promoteSuggestion(outfit.id);
     } finally {
-      setSavingIdx(null);
+      setSavingId(null);
     }
   }, []);
 
   const handleSaveNew = useCallback(async () => {
     if (!newOutfit) return;
-    setSavingIdx(-1);
+    setSavingId("new");
     try {
       await saveOutfit(newOutfit);
       setNewOutfit(null);
     } finally {
-      setSavingIdx(null);
+      setSavingId(null);
     }
   }, [newOutfit]);
 
@@ -258,7 +263,7 @@ export function Outfits() {
 
     if (pickerOutfitRef.kind === "suggestion") {
       setSuggestions((prev) =>
-        prev.map((o, i) => (i === pickerOutfitRef.idx ? apply(o) : o)),
+        prev.map((o) => (o.id === pickerOutfitRef.id ? { ...apply(o), id: o.id, createdAt: o.createdAt, status: o.status } : o)),
       );
     } else if (pickerOutfitRef.kind === "new") {
       setNewOutfit((prev) => (prev ? apply(prev) : prev));
@@ -274,7 +279,7 @@ export function Outfits() {
     if (!pickerTarget || !pickerOutfitRef) return null;
 
     const getOutfit = (): GeneratedOutfit | null => {
-      if (pickerOutfitRef.kind === "suggestion") return suggestions[pickerOutfitRef.idx] ?? null;
+      if (pickerOutfitRef.kind === "suggestion") return suggestions.find((s) => s.id === pickerOutfitRef.id) ?? null;
       if (pickerOutfitRef.kind === "new") return newOutfit;
       if (pickerOutfitRef.kind === "saved") return editDraft;
       return null;
@@ -424,10 +429,10 @@ export function Outfits() {
               <>
                 <button
                   onClick={handleSaveNew}
-                  disabled={savingIdx === -1 || Object.keys(newOutfit.slots).length === 0}
+                  disabled={savingId === "new" || Object.keys(newOutfit.slots).length === 0}
                   className="text-xs text-brand font-medium hover:underline cursor-pointer disabled:opacity-50"
                 >
-                  {savingIdx === -1 ? "Saving..." : "Save"}
+                  {savingId === "new" ? "Saving..." : "Save"}
                 </button>
                 <button
                   onClick={() => setNewOutfit(null)}
@@ -452,29 +457,30 @@ export function Outfits() {
         <section className="mb-6">
           <h2 className="text-h3 mb-3">Suggestions</h2>
           <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory">
-            {suggestions.map((outfit, i) => (
-              <div key={i} className="shrink-0 w-[85vw] max-w-80 snap-start">
+            {suggestions.map((outfit) => (
+              <div key={outfit.id} className="shrink-0 w-[85vw] max-w-80 snap-start">
                 <OutfitEditor
                   outfit={outfit}
                   itemMap={itemMap}
-                  onSlotTap={(slotId) => openPicker({ kind: "slot", slotId }, { kind: "suggestion", idx: i })}
-                  onExtraTap={(idx) => openPicker({ kind: "extra", index: idx }, { kind: "suggestion", idx: i })}
-                  onAddExtra={() => openPicker({ kind: "extra", index: null }, { kind: "suggestion", idx: i })}
+                  onSlotTap={(slotId) => openPicker({ kind: "slot", slotId }, { kind: "suggestion", id: outfit.id })}
+                  onExtraTap={(idx) => openPicker({ kind: "extra", index: idx }, { kind: "suggestion", id: outfit.id })}
+                  onAddExtra={() => openPicker({ kind: "extra", index: null }, { kind: "suggestion", id: outfit.id })}
                   subtitle={outfit.why}
                   actions={
                     <>
                       <button
-                        onClick={() => handleSave(outfit, i)}
-                        disabled={savingIdx === i}
+                        onClick={() => handleSave(outfit)}
+                        disabled={savingId === outfit.id}
                         className="text-xs text-brand font-medium hover:underline cursor-pointer disabled:opacity-50"
                       >
-                        {savingIdx === i ? "Saving..." : "Save"}
+                        {savingId === outfit.id ? "Saving..." : "Save"}
                       </button>
                       <button
-                        onClick={() => setSuggestions((prev) => prev.filter((_, j) => j !== i))}
-                        className="text-xs text-muted font-medium hover:underline cursor-pointer"
+                        onClick={() => handleDelete(outfit.id)}
+                        disabled={deletingId === outfit.id}
+                        className="text-xs text-muted font-medium hover:underline cursor-pointer disabled:opacity-50"
                       >
-                        Dismiss
+                        {deletingId === outfit.id ? "Dismissing..." : "Dismiss"}
                       </button>
                     </>
                   }

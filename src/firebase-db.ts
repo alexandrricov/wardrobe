@@ -217,7 +217,13 @@ export async function getLatestInsightReport(): Promise<AIInsightReport | null> 
 
 /* ── Saved outfits ─────────────────────────────────────── */
 
-export type SavedOutfit = GeneratedOutfit & { id: string; createdAt: Timestamp };
+export type OutfitStatus = "suggestion" | "saved";
+
+export type SavedOutfit = GeneratedOutfit & {
+  id: string;
+  createdAt: Timestamp;
+  status: OutfitStatus;
+};
 
 function outfitsCol() {
   const uid = auth.currentUser?.uid;
@@ -225,11 +231,33 @@ function outfitsCol() {
   return collection(db, "users", uid, "outfits");
 }
 
-export async function saveOutfit(outfit: GeneratedOutfit): Promise<string> {
+export async function saveOutfit(
+  outfit: GeneratedOutfit,
+  status: OutfitStatus = "saved",
+): Promise<string> {
   const col = outfitsCol();
   const newRef = doc(col);
-  await setDoc(newRef, { ...outfit, createdAt: serverTimestamp() });
+  await setDoc(newRef, { ...outfit, status, createdAt: serverTimestamp() });
   return newRef.id;
+}
+
+export async function saveSuggestions(outfits: GeneratedOutfit[]): Promise<void> {
+  if (outfits.length === 0) return;
+  const col = outfitsCol();
+  const batch = writeBatch(db);
+  for (const outfit of outfits) {
+    const ref = doc(col);
+    batch.set(ref, {
+      ...outfit,
+      status: "suggestion" as OutfitStatus,
+      createdAt: serverTimestamp(),
+    });
+  }
+  await batch.commit();
+}
+
+export async function promoteSuggestion(outfitId: string): Promise<void> {
+  await updateDoc(doc(outfitsCol(), outfitId), { status: "saved" });
 }
 
 export async function updateOutfit(outfitId: string, data: Partial<GeneratedOutfit>): Promise<void> {
@@ -241,15 +269,25 @@ export async function deleteOutfit(outfitId: string): Promise<void> {
 }
 
 export function subscribeOutfits(
-  cb: (outfits: SavedOutfit[]) => void,
+  cb: (data: { suggestions: SavedOutfit[]; saved: SavedOutfit[] }) => void,
 ): () => void {
   const q = query(outfitsCol(), orderBy("createdAt", "desc"));
   return onSnapshot(q, (snap) => {
-    const outfits: SavedOutfit[] = snap.docs.map((d) => ({
-      id: d.id,
-      ...(d.data() as Omit<SavedOutfit, "id">),
-    }));
-    cb(outfits);
+    const suggestions: SavedOutfit[] = [];
+    const saved: SavedOutfit[] = [];
+    for (const d of snap.docs) {
+      const outfit: SavedOutfit = {
+        id: d.id,
+        ...(d.data() as Omit<SavedOutfit, "id">),
+      };
+      if (!outfit.status) outfit.status = "saved";
+      if (outfit.status === "suggestion") {
+        suggestions.push(outfit);
+      } else {
+        saved.push(outfit);
+      }
+    }
+    cb({ suggestions, saved });
   });
 }
 
